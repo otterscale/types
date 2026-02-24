@@ -7,7 +7,7 @@ import { compile, type JSONSchema } from 'json-schema-to-typescript';
 import path from 'path';
 import { parseArgs } from 'util';
 
-import { ResourceService } from '../src/lib/api/resource/v1/resource_pb.ts';
+import { ResourceService } from '@otterscale/api/resource/v1';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
@@ -21,6 +21,11 @@ const { values } = parseArgs({
 			type: 'string',
 			short: 'u',
 			default: process.env.API_BASE_URL || 'http://localhost:8299'
+		},
+		token: {
+			type: 'string',
+			short: 't',
+			default: process.env.API_BEARER_TOKEN || ''
 		}
 	}
 });
@@ -28,8 +33,10 @@ const { values } = parseArgs({
 const CONFIG = {
 	cluster: values.cluster!,
 	baseUrl: values.baseUrl!,
-	outputDir: path.join(import.meta.dirname, '../src/lib/types'),
-	indexFile: path.join(import.meta.dirname, '../src/index.ts')
+	token: values.token!,
+	outputDir: path.join(import.meta.dirname, '../src'),
+	indexDtsFile: path.join(import.meta.dirname, '../src/index.d.ts'),
+	indexJsFile: path.join(import.meta.dirname, '../src/index.js')
 };
 
 const INCLUDE_GROUPS = new Set([
@@ -64,7 +71,15 @@ const INCLUDE_GROUPS = new Set([
 
 const transport = createConnectTransport({
 	httpVersion: '1.1',
-	baseUrl: CONFIG.baseUrl
+	baseUrl: CONFIG.baseUrl,
+	interceptors: CONFIG.token
+		? [
+				(next) => (req) => {
+					req.header.set('Authorization', `Bearer ${CONFIG.token}`);
+					return next(req);
+				}
+			]
+		: []
 });
 
 const client = createClient(ResourceService, transport);
@@ -73,6 +88,7 @@ async function main() {
 	console.log(`🔧 Configuration:`);
 	console.log(`   - Cluster:  ${CONFIG.cluster}`);
 	console.log(`   - Base URL: ${CONFIG.baseUrl}`);
+	console.log(`   - Token:    ${CONFIG.token ? '***' : '(none)'}`);
 	console.log(`   - Output:   ${CONFIG.outputDir}`);
 	console.log('🔄 Connecting to Backend to fetch schemas...');
 
@@ -132,11 +148,15 @@ async function main() {
 					ignoreMinAndMaxItems: true
 				});
 
-				// Write file
-				const fileName = `${gvk}.ts`;
-				fs.writeFileSync(path.join(CONFIG.outputDir, fileName), tsCode);
+				// Write .d.ts (type declarations)
+				const dtsFileName = `${gvk}.d.ts`;
+				fs.writeFileSync(path.join(CONFIG.outputDir, dtsFileName), tsCode);
 
-				indexExports.push(`export * from './lib/types/${gvk}';`);
+				// Write .js (empty module, interfaces have no runtime representation)
+				const jsFileName = `${gvk}.js`;
+				fs.writeFileSync(path.join(CONFIG.outputDir, jsFileName), 'export {};\n');
+
+				indexExports.push(`export * from './${gvk}.js';`);
 				successCount++;
 			} catch (err) {
 				console.warn(`⚠️  Failed to generate type for ${res.kind}:`, err);
@@ -147,15 +167,18 @@ async function main() {
 		// Step 3: Wrap up
 		console.log('\n🚫 Skipped Groups:', [...excludeGroups].sort());
 
-		// Generate index.ts
-		const indexContent = indexExports.join('\n');
-		fs.writeFileSync(CONFIG.indexFile, indexContent);
+		// Generate index.d.ts (type re-exports)
+		const indexDtsContent = indexExports.join('\n');
+		fs.writeFileSync(CONFIG.indexDtsFile, indexDtsContent);
+
+		// Generate index.js (runtime re-exports, resolves to empty modules)
+		fs.writeFileSync(CONFIG.indexJsFile, indexDtsContent);
 
 		console.log('\n=============================================');
 		console.log(`✅ Sync Completed!`);
 		console.log(`   - Success: ${successCount}`);
 		console.log(`   - Failed:  ${failCount}`);
-		console.log(`   - Output:  ${CONFIG.indexFile}`);
+		console.log(`   - Output:  ${CONFIG.indexDtsFile}`);
 		console.log('=============================================');
 
 		if (failCount > 0) {
