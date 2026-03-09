@@ -1,6 +1,6 @@
 {
   "name": "@otterscale/types",
-  "version": "0.8.1",
+  "version": "0.8.22",
   "type": "module",
   "scripts": {
     "sync": "tsx scripts/sync-types.ts"
@@ -27,6 +27,7 @@
     "@types/node": "^25.3.0",
     "js-yaml": "^4.1.1",
     "json-schema-to-typescript": "^15.0.4",
+    "sort-keys": "^6.0.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0"
   }

@@ -21,9 +21,31 @@
  */
 export interface GatewayNetworkingK8SIoV1GatewayClass {
   /**
+   * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   */
+  apiVersion?: string;
+  /**
+   * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   */
+  kind?: string;
+  /**
    * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
    */
   metadata?: {
+    /**
+     * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
+     */
+    annotations?: {
+      [k: string]: string;
+    };
+    /**
+     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+     */
+    creationTimestamp?: string;
+    /**
+     * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
+     */
+    deletionGracePeriodSeconds?: number;
     /**
      * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
      */
@@ -33,17 +55,27 @@ export interface GatewayNetworkingK8SIoV1GatewayClass {
      */
     finalizers?: string[];
     /**
+     * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
+     *
+     * If this field is specified and the generated name exists, the server will return a 409.
+     *
+     * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
+     */
+    generateName?: string;
+    /**
+     * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
+     */
+    generation?: number;
+    /**
+     * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+     */
+    labels?: {
+      [k: string]: string;
+    };
+    /**
      * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
      */
     managedFields?: {
-      /**
-       * Subresource is the name of the subresource used to update that object, or empty string if the object was updated through the main resource. The value of this field is used to distinguish between managers, even if they share the same name. For example, a status update will be distinct from a regular update using the same manager name. Note that the APIVersion field is not related to the Subresource field and it always corresponds to the version of the main resource.
-       */
-      subresource?: string;
-      /**
-       * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-       */
-      time?: string;
       /**
        * APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted.
        */
@@ -70,16 +102,16 @@ export interface GatewayNetworkingK8SIoV1GatewayClass {
        * Operation is the type of operation which lead to this ManagedFieldsEntry being created. The only valid values for this field are 'Apply' and 'Update'.
        */
       operation?: string;
+      /**
+       * Subresource is the name of the subresource used to update that object, or empty string if the object was updated through the main resource. The value of this field is used to distinguish between managers, even if they share the same name. For example, a status update will be distinct from a regular update using the same manager name. Note that the APIVersion field is not related to the Subresource field and it always corresponds to the version of the main resource.
+       */
+      subresource?: string;
+      /**
+       * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+       */
+      time?: string;
       [k: string]: unknown;
     }[];
-    /**
-     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-     */
-    creationTimestamp?: string;
-    /**
-     * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
-     */
-    deletionGracePeriodSeconds?: number;
     /**
      * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
      */
@@ -91,47 +123,9 @@ export interface GatewayNetworkingK8SIoV1GatewayClass {
      */
     namespace?: string;
     /**
-     * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
-     *
-     * If this field is specified and the generated name exists, the server will return a 409.
-     *
-     * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
-     */
-    generateName?: string;
-    /**
-     * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
-     *
-     * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
-     */
-    resourceVersion?: string;
-    /**
-     * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
-     */
-    annotations?: {
-      [k: string]: string;
-    };
-    /**
-     * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
-     */
-    generation?: number;
-    /**
-     * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
-     */
-    labels?: {
-      [k: string]: string;
-    };
-    /**
      * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
      */
     ownerReferences?: {
-      /**
-       * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
-       */
-      name: string;
-      /**
-       * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
-       */
-      uid: string;
       /**
        * API version of the referent.
        */
@@ -148,8 +142,22 @@ export interface GatewayNetworkingK8SIoV1GatewayClass {
        * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
        */
       kind: string;
+      /**
+       * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+       */
+      name: string;
+      /**
+       * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+       */
+      uid: string;
       [k: string]: unknown;
     }[];
+    /**
+     * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
+     *
+     * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+     */
+    resourceVersion?: string;
     /**
      * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
      */
@@ -242,6 +250,16 @@ export interface GatewayNetworkingK8SIoV1GatewayClass {
      */
     conditions?: {
       /**
+       * lastTransitionTime is the last time the condition transitioned from one status to another.
+       * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+       */
+      lastTransitionTime: string;
+      /**
+       * message is a human readable message indicating details about the transition.
+       * This may be an empty string.
+       */
+      message: string;
+      /**
        * observedGeneration represents the .metadata.generation that the condition was set based upon.
        * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
        * with respect to the current state of the instance.
@@ -263,16 +281,6 @@ export interface GatewayNetworkingK8SIoV1GatewayClass {
        * type of condition in CamelCase or in foo.example.com/CamelCase.
        */
       type: string;
-      /**
-       * lastTransitionTime is the last time the condition transitioned from one status to another.
-       * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
-       */
-      lastTransitionTime: string;
-      /**
-       * message is a human readable message indicating details about the transition.
-       * This may be an empty string.
-       */
-      message: string;
       [k: string]: unknown;
     }[];
     /**
@@ -291,13 +299,5 @@ export interface GatewayNetworkingK8SIoV1GatewayClass {
     }[];
     [k: string]: unknown;
   };
-  /**
-   * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-   */
-  apiVersion?: string;
-  /**
-   * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-   */
-  kind?: string;
   [k: string]: unknown;
 }

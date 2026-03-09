@@ -2,7 +2,7 @@
 
 /**
  * Workspace is the Schema for the workspaces API.
- * A Workspace represents a logical isolation unit (Namespace) with associated policies, quotas, and user access.
+ * A Workspace represents a logical isolation unit (Namespace) with associated policies, quotas, and member access.
  */
 export interface TenantOtterscaleIoV1Alpha1Workspace {
   /**
@@ -18,12 +18,6 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
    */
   metadata?: {
     /**
-     * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
-     *
-     * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
-     */
-    resourceVersion?: string;
-    /**
      * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
      */
     annotations?: {
@@ -33,6 +27,14 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
      * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
      */
     creationTimestamp?: string;
+    /**
+     * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
+     */
+    deletionGracePeriodSeconds?: number;
+    /**
+     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+     */
+    deletionTimestamp?: string;
     /**
      * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
      */
@@ -46,23 +48,9 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
      */
     generateName?: string;
     /**
-     * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+     * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
      */
-    name?: string;
-    /**
-     * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
-     *
-     * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
-     */
-    namespace?: string;
-    /**
-     * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
-     */
-    selfLink?: string;
-    /**
-     * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
-     */
-    deletionGracePeriodSeconds?: number;
+    generation?: number;
     /**
      * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
      */
@@ -110,17 +98,19 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
       [k: string]: unknown;
     }[];
     /**
+     * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+     */
+    name?: string;
+    /**
+     * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
+     *
+     * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
+     */
+    namespace?: string;
+    /**
      * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
      */
     ownerReferences?: {
-      /**
-       * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
-       */
-      name: string;
-      /**
-       * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
-       */
-      uid: string;
       /**
        * API version of the referent.
        */
@@ -137,22 +127,32 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
        * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
        */
       kind: string;
+      /**
+       * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+       */
+      name: string;
+      /**
+       * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+       */
+      uid: string;
       [k: string]: unknown;
     }[];
     /**
-     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+     * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
+     *
+     * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
      */
-    deletionTimestamp?: string;
+    resourceVersion?: string;
+    /**
+     * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+     */
+    selfLink?: string;
     /**
      * UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.
      *
      * Populated by the system. Read-only. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
      */
     uid?: string;
-    /**
-     * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
-     */
-    generation?: number;
     [k: string]: unknown;
   };
   /**
@@ -160,13 +160,19 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
    */
   spec: {
     /**
-     * LimitRange describes the default resource limits and requests for pods in the workspace.
+     * LimitRange defines the default resource limits and requests for pods in the workspace.
      */
     limitRange?: {
       /**
        * Limits is the list of LimitRangeItem objects that are enforced.
        */
       limits: {
+        /**
+         * Default resource requirement limit value by resource name if resource limit is omitted.
+         */
+        default?: {
+          [k: string]: number | string;
+        };
         /**
          * DefaultRequest is the default resource requirement request value by resource name if resource request is omitted.
          */
@@ -195,16 +201,31 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
          * Type of resource that this limit applies to.
          */
         type: string;
-        /**
-         * Default resource requirement limit value by resource name if resource limit is omitted.
-         */
-        default?: {
-          [k: string]: number | string;
-        };
         [k: string]: unknown;
       }[];
       [k: string]: unknown;
     };
+    /**
+     * Members is the list of members granted access to this workspace.
+     *
+     * @minItems 1
+     */
+    members: {
+      /**
+       * Name is the human-readable display name of the member.
+       */
+      name?: string;
+      /**
+       * Role defines the authorization level (Admin, Edit, View).
+       */
+      role: 'admin' | 'edit' | 'view';
+      /**
+       * Subject is the unique identifier of the member (e.g., OIDC subject or username).
+       * This identifier maps directly to the Kubernetes RBAC Subject.
+       */
+      subject: string;
+      [k: string]: unknown;
+    }[];
     /**
      * Namespace is the name of the Kubernetes Namespace to be created for this workspace.
      * It must be unique across all Workspaces.
@@ -218,6 +239,8 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
        * AllowedNamespaces specifies a list of external namespaces permitted to access this workspace
        * when isolation is enabled. Essential system namespaces (e.g., 'istio-system', 'monitoring')
        * should be included here if required.
+       *
+       * @maxItems 64
        */
       allowedNamespaces?: string[];
       /**
@@ -228,14 +251,9 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
       [k: string]: unknown;
     };
     /**
-     * ResourceQuota describes the compute resource constraints (CPU, Memory, etc.) applied to the underlying namespace.
+     * ResourceQuota defines the compute resource constraints (CPU, Memory, etc.) applied to the underlying namespace.
      */
     resourceQuota?: {
-      /**
-       * A collection of filters that must match each object tracked by a quota.
-       * If not specified, the quota matches all objects.
-       */
-      scopes?: string[];
       /**
        * hard is the set of desired hard limits for each named resource.
        * More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/
@@ -273,29 +291,13 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
         }[];
         [k: string]: unknown;
       };
+      /**
+       * A collection of filters that must match each object tracked by a quota.
+       * If not specified, the quota matches all objects.
+       */
+      scopes?: string[];
       [k: string]: unknown;
     };
-    /**
-     * Users is the list of users granted access to this workspace.
-     *
-     * @minItems 1
-     */
-    users: {
-      /**
-       * Name is the human-readable display name of the user.
-       */
-      name?: string;
-      /**
-       * Role defines the authorization level (Admin, Edit, View).
-       */
-      role: 'admin' | 'edit' | 'view';
-      /**
-       * Subject is the unique identifier of the user (e.g., OIDC subject or username).
-       * This identifier maps directly to the Kubernetes RBAC Subject.
-       */
-      subject: string;
-      [k: string]: unknown;
-    }[];
     [k: string]: unknown;
   };
   /**
@@ -303,279 +305,34 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
    */
   status?: {
     /**
-     * NamespaceRef is a reference to the corev1.Namespace managed by this Workspace.
-     */
-    namespaceRef?: {
-      /**
-       * API version of the referent.
-       */
-      apiVersion?: string;
-      /**
-       * If referring to a piece of an object instead of an entire object, this string
-       * should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
-       * For example, if the object reference is to a container within a pod, this would take on a value like:
-       * "spec.containers{name}" (where "name" refers to the name of the container that triggered
-       * the event) or if no container name is specified "spec.containers[2]" (container with
-       * index 2 in this pod). This syntax is chosen only to have some well-defined way of
-       * referencing a part of an object.
-       */
-      fieldPath?: string;
-      /**
-       * Kind of the referent.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-       */
-      kind?: string;
-      /**
-       * Name of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-       */
-      name?: string;
-      /**
-       * Namespace of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
-       */
-      namespace?: string;
-      /**
-       * Specific resourceVersion to which this reference is made, if any.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
-       */
-      resourceVersion?: string;
-      /**
-       * UID of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
-       */
-      uid?: string;
-      [k: string]: unknown;
-    };
-    /**
-     * NetworkPolicyRef is a reference to the corev1.NetworkPolicy enforcing network isolation.
-     */
-    networkPolicyRef?: {
-      /**
-       * API version of the referent.
-       */
-      apiVersion?: string;
-      /**
-       * If referring to a piece of an object instead of an entire object, this string
-       * should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
-       * For example, if the object reference is to a container within a pod, this would take on a value like:
-       * "spec.containers{name}" (where "name" refers to the name of the container that triggered
-       * the event) or if no container name is specified "spec.containers[2]" (container with
-       * index 2 in this pod). This syntax is chosen only to have some well-defined way of
-       * referencing a part of an object.
-       */
-      fieldPath?: string;
-      /**
-       * Kind of the referent.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-       */
-      kind?: string;
-      /**
-       * Name of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-       */
-      name?: string;
-      /**
-       * Namespace of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
-       */
-      namespace?: string;
-      /**
-       * Specific resourceVersion to which this reference is made, if any.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
-       */
-      resourceVersion?: string;
-      /**
-       * UID of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
-       */
-      uid?: string;
-      [k: string]: unknown;
-    };
-    /**
-     * PeerAuthenticationRef is a reference to the Istio PeerAuthentication resource for mTLS settings.
-     */
-    peerAuthenticationRef?: {
-      /**
-       * Specific resourceVersion to which this reference is made, if any.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
-       */
-      resourceVersion?: string;
-      /**
-       * UID of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
-       */
-      uid?: string;
-      /**
-       * API version of the referent.
-       */
-      apiVersion?: string;
-      /**
-       * If referring to a piece of an object instead of an entire object, this string
-       * should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
-       * For example, if the object reference is to a container within a pod, this would take on a value like:
-       * "spec.containers{name}" (where "name" refers to the name of the container that triggered
-       * the event) or if no container name is specified "spec.containers[2]" (container with
-       * index 2 in this pod). This syntax is chosen only to have some well-defined way of
-       * referencing a part of an object.
-       */
-      fieldPath?: string;
-      /**
-       * Kind of the referent.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-       */
-      kind?: string;
-      /**
-       * Name of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-       */
-      name?: string;
-      /**
-       * Namespace of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
-       */
-      namespace?: string;
-      [k: string]: unknown;
-    };
-    /**
-     * ResourceQuotaRef is a reference to the corev1.ResourceQuota managed by this Workspace.
-     */
-    resourceQuotaRef?: {
-      /**
-       * If referring to a piece of an object instead of an entire object, this string
-       * should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
-       * For example, if the object reference is to a container within a pod, this would take on a value like:
-       * "spec.containers{name}" (where "name" refers to the name of the container that triggered
-       * the event) or if no container name is specified "spec.containers[2]" (container with
-       * index 2 in this pod). This syntax is chosen only to have some well-defined way of
-       * referencing a part of an object.
-       */
-      fieldPath?: string;
-      /**
-       * Kind of the referent.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-       */
-      kind?: string;
-      /**
-       * Name of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-       */
-      name?: string;
-      /**
-       * Namespace of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
-       */
-      namespace?: string;
-      /**
-       * Specific resourceVersion to which this reference is made, if any.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
-       */
-      resourceVersion?: string;
-      /**
-       * UID of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
-       */
-      uid?: string;
-      /**
-       * API version of the referent.
-       */
-      apiVersion?: string;
-      [k: string]: unknown;
-    };
-    /**
-     * RoleBindingRefs contains references to all RBAC RoleBindings created for the workspace users.
-     */
-    roleBindingRefs?: {
-      /**
-       * Namespace of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
-       */
-      namespace?: string;
-      /**
-       * Specific resourceVersion to which this reference is made, if any.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
-       */
-      resourceVersion?: string;
-      /**
-       * UID of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
-       */
-      uid?: string;
-      /**
-       * API version of the referent.
-       */
-      apiVersion?: string;
-      /**
-       * If referring to a piece of an object instead of an entire object, this string
-       * should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
-       * For example, if the object reference is to a container within a pod, this would take on a value like:
-       * "spec.containers{name}" (where "name" refers to the name of the container that triggered
-       * the event) or if no container name is specified "spec.containers[2]" (container with
-       * index 2 in this pod). This syntax is chosen only to have some well-defined way of
-       * referencing a part of an object.
-       */
-      fieldPath?: string;
-      /**
-       * Kind of the referent.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-       */
-      kind?: string;
-      /**
-       * Name of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-       */
-      name?: string;
-      [k: string]: unknown;
-    }[];
-    /**
      * AuthorizationPolicyRef is a reference to the Istio AuthorizationPolicy enforcing network isolation.
      */
     authorizationPolicyRef?: {
       /**
-       * API version of the referent.
+       * Name is the name of the referenced resource.
        */
-      apiVersion?: string;
+      name: string;
       /**
-       * If referring to a piece of an object instead of an entire object, this string
-       * should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
-       * For example, if the object reference is to a container within a pod, this would take on a value like:
-       * "spec.containers{name}" (where "name" refers to the name of the container that triggered
-       * the event) or if no container name is specified "spec.containers[2]" (container with
-       * index 2 in this pod). This syntax is chosen only to have some well-defined way of
-       * referencing a part of an object.
-       */
-      fieldPath?: string;
-      /**
-       * Kind of the referent.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-       */
-      kind?: string;
-      /**
-       * Name of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-       */
-      name?: string;
-      /**
-       * Namespace of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+       * Namespace is the namespace of the referenced resource.
+       * Empty for cluster-scoped resources.
        */
       namespace?: string;
-      /**
-       * Specific resourceVersion to which this reference is made, if any.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
-       */
-      resourceVersion?: string;
-      /**
-       * UID of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
-       */
-      uid?: string;
       [k: string]: unknown;
     };
     /**
      * Conditions store the status conditions of the Workspace (e.g., Ready, Failed).
      */
     conditions?: {
+      /**
+       * lastTransitionTime is the last time the condition transitioned from one status to another.
+       * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+       */
+      lastTransitionTime: string;
+      /**
+       * message is a human readable message indicating details about the transition.
+       * This may be an empty string.
+       */
+      message: string;
       /**
        * observedGeneration represents the .metadata.generation that the condition was set based upon.
        * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
@@ -598,63 +355,104 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
        * type of condition in CamelCase or in foo.example.com/CamelCase.
        */
       type: string;
-      /**
-       * lastTransitionTime is the last time the condition transitioned from one status to another.
-       * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
-       */
-      lastTransitionTime: string;
-      /**
-       * message is a human readable message indicating details about the transition.
-       * This may be an empty string.
-       */
-      message: string;
       [k: string]: unknown;
     }[];
     /**
-     * LimitRangeRef is a reference to the corev1.LimitRange managed by this Workspace.
+     * LimitRangeRef is a reference to the LimitRange managed by this Workspace.
      */
     limitRangeRef?: {
       /**
-       * API version of the referent.
+       * Name is the name of the referenced resource.
        */
-      apiVersion?: string;
+      name: string;
       /**
-       * If referring to a piece of an object instead of an entire object, this string
-       * should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
-       * For example, if the object reference is to a container within a pod, this would take on a value like:
-       * "spec.containers{name}" (where "name" refers to the name of the container that triggered
-       * the event) or if no container name is specified "spec.containers[2]" (container with
-       * index 2 in this pod). This syntax is chosen only to have some well-defined way of
-       * referencing a part of an object.
-       */
-      fieldPath?: string;
-      /**
-       * Kind of the referent.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-       */
-      kind?: string;
-      /**
-       * Name of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-       */
-      name?: string;
-      /**
-       * Namespace of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+       * Namespace is the namespace of the referenced resource.
+       * Empty for cluster-scoped resources.
        */
       namespace?: string;
-      /**
-       * Specific resourceVersion to which this reference is made, if any.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
-       */
-      resourceVersion?: string;
-      /**
-       * UID of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
-       */
-      uid?: string;
       [k: string]: unknown;
     };
+    /**
+     * NamespaceRef is a reference to the Namespace managed by this Workspace.
+     */
+    namespaceRef?: {
+      /**
+       * Name is the name of the referenced resource.
+       */
+      name: string;
+      /**
+       * Namespace is the namespace of the referenced resource.
+       * Empty for cluster-scoped resources.
+       */
+      namespace?: string;
+      [k: string]: unknown;
+    };
+    /**
+     * NetworkPolicyRef is a reference to the NetworkPolicy enforcing network isolation.
+     */
+    networkPolicyRef?: {
+      /**
+       * Name is the name of the referenced resource.
+       */
+      name: string;
+      /**
+       * Namespace is the namespace of the referenced resource.
+       * Empty for cluster-scoped resources.
+       */
+      namespace?: string;
+      [k: string]: unknown;
+    };
+    /**
+     * ObservedGeneration is the most recent generation observed by the controller.
+     * It corresponds to the Workspace's generation, which is updated on mutation by the API Server.
+     * This allows clients to determine whether the controller has processed the latest spec changes.
+     */
+    observedGeneration?: number;
+    /**
+     * PeerAuthenticationRef is a reference to the Istio PeerAuthentication resource for mTLS settings.
+     */
+    peerAuthenticationRef?: {
+      /**
+       * Name is the name of the referenced resource.
+       */
+      name: string;
+      /**
+       * Namespace is the namespace of the referenced resource.
+       * Empty for cluster-scoped resources.
+       */
+      namespace?: string;
+      [k: string]: unknown;
+    };
+    /**
+     * ResourceQuotaRef is a reference to the ResourceQuota managed by this Workspace.
+     */
+    resourceQuotaRef?: {
+      /**
+       * Name is the name of the referenced resource.
+       */
+      name: string;
+      /**
+       * Namespace is the namespace of the referenced resource.
+       * Empty for cluster-scoped resources.
+       */
+      namespace?: string;
+      [k: string]: unknown;
+    };
+    /**
+     * RoleBindingRefs contains references to all RBAC RoleBindings created for the workspace members.
+     */
+    roleBindingRefs?: {
+      /**
+       * Name is the name of the referenced resource.
+       */
+      name: string;
+      /**
+       * Namespace is the namespace of the referenced resource.
+       * Empty for cluster-scoped resources.
+       */
+      namespace?: string;
+      [k: string]: unknown;
+    }[];
     [k: string]: unknown;
   };
   [k: string]: unknown;

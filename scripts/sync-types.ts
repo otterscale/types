@@ -1,194 +1,219 @@
-import { toJson } from '@bufbuild/protobuf';
-import { StructSchema } from '@bufbuild/protobuf/wkt';
-import { createClient } from '@connectrpc/connect';
-import { createConnectTransport } from '@connectrpc/connect-node';
-import fs from 'fs';
-import { compile, type JSONSchema } from 'json-schema-to-typescript';
-import path from 'path';
-import { parseArgs } from 'util';
+import { toJson } from "@bufbuild/protobuf";
+import { StructSchema } from "@bufbuild/protobuf/wkt";
+import { createClient } from "@connectrpc/connect";
+import { createConnectTransport } from "@connectrpc/connect-node";
+import fs from "fs";
+import { compile, type JSONSchema } from "json-schema-to-typescript";
+import path from "path";
+import sortKeys from "sort-keys";
+import { parseArgs } from "util";
 
-import { ResourceService } from '@otterscale/api/resource/v1';
+import { ResourceService } from "@otterscale/api/resource/v1";
 
 const { values } = parseArgs({
-	args: process.argv.slice(2),
-	options: {
-		cluster: {
-			type: 'string',
-			short: 'c',
-			default: process.env.CLUSTER_NAME || 'cluster'
-		},
-		baseUrl: {
-			type: 'string',
-			short: 'u',
-			default: process.env.API_BASE_URL || 'http://localhost:8299'
-		},
-		token: {
-			type: 'string',
-			short: 't',
-			default: process.env.API_BEARER_TOKEN || ''
-		}
-	}
+  args: process.argv.slice(2),
+  options: {
+    cluster: {
+      type: "string",
+      short: "c",
+      default: process.env.CLUSTER_NAME || "cluster",
+    },
+    baseUrl: {
+      type: "string",
+      short: "u",
+      default: process.env.API_BASE_URL || "http://localhost:8299",
+    },
+    token: {
+      type: "string",
+      short: "t",
+      default: process.env.API_BEARER_TOKEN || "",
+    },
+  },
 });
 
 const CONFIG = {
-	cluster: values.cluster!,
-	baseUrl: values.baseUrl!,
-	token: values.token!,
-	outputDir: path.join(import.meta.dirname, '../src'),
-	indexDtsFile: path.join(import.meta.dirname, '../src/index.d.ts'),
-	indexJsFile: path.join(import.meta.dirname, '../src/index.js')
+  cluster: values.cluster!,
+  baseUrl: values.baseUrl!,
+  token: values.token!,
+  outputDir: path.join(import.meta.dirname, "../src"),
+  indexDtsFile: path.join(import.meta.dirname, "../src/index.d.ts"),
+  indexJsFile: path.join(import.meta.dirname, "../src/index.js"),
 };
 
 const INCLUDE_GROUPS = new Set([
-	'', // kubernetes core
-	'admissionregistration.k8s.io',
-	'apiextensions.k8s.io',
-	'apiregistration.k8s.io',
-	'apps',
-	'authentication.k8s.io',
-	'authorization.k8s.io',
-	'autoscaling',
-	'batch',
-	'certificates.k8s.io',
-	'coordination.k8s.io',
-	'discovery.k8s.io',
-	'events.k8s.io',
-	'flowcontrol.apiserver.k8s.io',
-	'gateway.networking.k8s.io',
-	'groupsnapshot.storage.k8s.io',
-	'inference.networking.k8s.io',
-	'metrics.k8s.io',
-	'networking.k8s.io',
-	'node.k8s.io',
-	'policy',
-	'rbac.authorization.k8s.io',
-	'scheduling.k8s.io',
-	'security.istio.io', // istio
-	'snapshot.storage.k8s.io',
-	'storage.k8s.io',
-	'tenant.otterscale.io' // otterscale
+  "", // kubernetes core
+  "admissionregistration.k8s.io",
+  "apiextensions.k8s.io",
+  "apiregistration.k8s.io",
+  "apps",
+  "authentication.k8s.io",
+  "authorization.k8s.io",
+  "autoscaling",
+  "batch",
+  "certificates.k8s.io",
+  "coordination.k8s.io",
+  "discovery.k8s.io",
+  "events.k8s.io",
+  "flowcontrol.apiserver.k8s.io",
+  "gateway.networking.k8s.io",
+  "groupsnapshot.storage.k8s.io",
+  "inference.networking.k8s.io",
+  "metrics.k8s.io",
+  "networking.k8s.io",
+  "node.k8s.io",
+  "policy",
+  "rbac.authorization.k8s.io",
+  "scheduling.k8s.io",
+  "snapshot.storage.k8s.io",
+  "storage.k8s.io",
+  "model.otterscale.io",
+  "module.otterscale.io",
+  "workload.otterscale.io",
+  "tenant.otterscale.io",
 ]);
 
 const transport = createConnectTransport({
-	httpVersion: '1.1',
-	baseUrl: CONFIG.baseUrl,
-	interceptors: CONFIG.token
-		? [
-				(next) => (req) => {
-					req.header.set('Authorization', `Bearer ${CONFIG.token}`);
-					return next(req);
-				}
-			]
-		: []
+  httpVersion: "1.1",
+  baseUrl: CONFIG.baseUrl,
+  interceptors: CONFIG.token
+    ? [
+        (next) => (req) => {
+          req.header.set("Authorization", `Bearer ${CONFIG.token}`);
+          return next(req);
+        },
+      ]
+    : [],
 });
 
 const client = createClient(ResourceService, transport);
 
 async function main() {
-	console.log(`🔧 Configuration:`);
-	console.log(`   - Cluster:  ${CONFIG.cluster}`);
-	console.log(`   - Base URL: ${CONFIG.baseUrl}`);
-	console.log(`   - Token:    ${CONFIG.token ? '***' : '(none)'}`);
-	console.log(`   - Output:   ${CONFIG.outputDir}`);
-	console.log('🔄 Connecting to Backend to fetch schemas...');
+  console.log(`🔧 Configuration:`);
+  console.log(`   - Cluster:  ${CONFIG.cluster}`);
+  console.log(`   - Base URL: ${CONFIG.baseUrl}`);
+  console.log(`   - Token:    ${CONFIG.token ? "***" : "(none)"}`);
+  console.log(`   - Output:   ${CONFIG.outputDir}`);
+  console.log("🔄 Connecting to Backend to fetch schemas...");
 
-	if (!fs.existsSync(CONFIG.outputDir)) {
-		fs.mkdirSync(CONFIG.outputDir, { recursive: true });
-	}
+  if (!fs.existsSync(CONFIG.outputDir)) {
+    fs.mkdirSync(CONFIG.outputDir, { recursive: true });
+  }
 
-	try {
-		// Step 1: Discovery
-		const discoveryRes = await client.discovery({ cluster: CONFIG.cluster });
-		const resources = discoveryRes.apiResources;
+  // Remove existing generated files so output is exactly what this run produces
+  const existing = fs.readdirSync(CONFIG.outputDir);
+  for (const name of existing) {
+    if (name.endsWith(".d.ts") || name.endsWith(".js")) {
+      fs.unlinkSync(path.join(CONFIG.outputDir, name));
+    }
+  }
+  console.log(
+    `🧹 Cleared ${existing.filter((n) => n.endsWith(".d.ts") || n.endsWith(".js")).length} existing generated file(s).`,
+  );
 
-		console.log(`📦 Found ${resources.length} total resources via Discovery.`);
+  try {
+    // Step 1: Discovery
+    const discoveryRes = await client.discovery({ cluster: CONFIG.cluster });
+    const resources = discoveryRes.apiResources;
 
-		const indexExports: string[] = [];
-		const excludeGroups = new Set<string>();
-		let successCount = 0;
-		let failCount = 0;
+    console.log(`📦 Found ${resources.length} total resources via Discovery.`);
 
-		// Step 2: Iterate & Generate
-		for (const res of resources) {
-			// Filter: Group check
-			if (!INCLUDE_GROUPS.has(res.group)) {
-				excludeGroups.add(res.group);
-				continue;
-			}
+    const indexExports: string[] = [];
+    const excludeGroups = new Set<string>();
+    let successCount = 0;
+    let failCount = 0;
 
-			// Filter: Subresource check (e.g., pods/status)
-			if (res.resource.includes('/')) {
-				// console.debug(`\t- Skipping subresource: ${res.resource}`);
-				continue;
-			}
+    // Step 2: Iterate & Generate
+    for (const res of resources) {
+      // Filter: Group check
+      if (!INCLUDE_GROUPS.has(res.group)) {
+        excludeGroups.add(res.group);
+        continue;
+      }
 
-			try {
-				console.log(`\t- Fetching schema for ${res.kind} (${res.group}/${res.version})...`);
+      // Filter: Subresource check (e.g., pods/status)
+      if (res.resource.includes("/")) {
+        // console.debug(`\t- Skipping subresource: ${res.resource}`);
+        continue;
+      }
 
-				// Fetch Schema RPC
-				const schemaRes = await client.schema({
-					cluster: CONFIG.cluster,
-					group: res.group,
-					version: res.version,
-					kind: res.kind
-				});
+      try {
+        console.log(
+          `\t- Fetching schema for ${res.kind} (${res.group}/${res.version})...`,
+        );
 
-				const gvk = `${res.group ? res.group : 'core'}.${res.version}.${res.kind}`;
+        // Fetch Schema RPC
+        const schemaRes = await client.schema({
+          cluster: CONFIG.cluster,
+          group: res.group,
+          version: res.version,
+          kind: res.kind,
+        });
 
-				// Convert Protobuf Struct to JSON Object
-				const jsonSchema = toJson(StructSchema, schemaRes) as JSONSchema;
+        const gvk = `${res.group ? res.group : "core"}.${res.version}.${res.kind}`;
 
-				// Add title for TS interface naming
-				jsonSchema.title = gvk;
+        // Convert Protobuf Struct to JSON Object
+        const jsonSchema = toJson(StructSchema, schemaRes) as JSONSchema;
 
-				// Compile to TypeScript
-				const tsCode = await compile(jsonSchema, gvk, {
-					bannerComment: `/** Generated from Remote JSON Schema for ${gvk} */`,
-					style: { singleQuote: true, semi: true },
-					ignoreMinAndMaxItems: true
-				});
+        // Add title for TS interface naming
+        jsonSchema.title = gvk;
 
-				// Write .d.ts (type declarations)
-				const dtsFileName = `${gvk}.d.ts`;
-				fs.writeFileSync(path.join(CONFIG.outputDir, dtsFileName), tsCode);
+        // Sort property keys before compiling so generated files have deterministic field order
+        const sortedSchema = sortKeys(jsonSchema, { deep: true });
 
-				// Write .js (empty module, interfaces have no runtime representation)
-				const jsFileName = `${gvk}.js`;
-				fs.writeFileSync(path.join(CONFIG.outputDir, jsFileName), 'export {};\n');
+        // Compile to TypeScript
+        const tsCode = await compile(sortedSchema, gvk, {
+          bannerComment: `/** Generated from Remote JSON Schema for ${gvk} */`,
+          style: { singleQuote: true, semi: true },
+          ignoreMinAndMaxItems: true,
+        });
 
-				indexExports.push(`export * from './${gvk}.js';`);
-				successCount++;
-			} catch (err) {
-				console.warn(`⚠️  Failed to generate type for ${res.kind}:`, err);
-				failCount++;
-			}
-		}
+        // Write .d.ts (type declarations)
+        const dtsFileName = `${gvk}.d.ts`;
+        fs.writeFileSync(path.join(CONFIG.outputDir, dtsFileName), tsCode);
 
-		// Step 3: Wrap up
-		console.log('\n🚫 Skipped Groups:', [...excludeGroups].sort());
+        // Write .js (empty stub: interfaces have no runtime representation,
+        // but ESM resolution requires a loadable module; .d.ts alone is not resolved at runtime)
+        const jsFileName = `${gvk}.js`;
+        fs.writeFileSync(
+          path.join(CONFIG.outputDir, jsFileName),
+          "export {};\n",
+        );
 
-		// Generate index.d.ts (type re-exports)
-		const indexDtsContent = indexExports.join('\n');
-		fs.writeFileSync(CONFIG.indexDtsFile, indexDtsContent);
+        indexExports.push(`export * from './${gvk}.js';`);
+        successCount++;
+      } catch (err) {
+        console.warn(`⚠️  Failed to generate type for ${res.kind}:`, err);
+        failCount++;
+      }
+    }
 
-		// Generate index.js (runtime re-exports, resolves to empty modules)
-		fs.writeFileSync(CONFIG.indexJsFile, indexDtsContent);
+    // Step 3: Wrap up
+    console.log("\n🚫 Skipped Groups:", [...excludeGroups].sort());
 
-		console.log('\n=============================================');
-		console.log(`✅ Sync Completed!`);
-		console.log(`   - Success: ${successCount}`);
-		console.log(`   - Failed:  ${failCount}`);
-		console.log(`   - Output:  ${CONFIG.indexDtsFile}`);
-		console.log('=============================================');
+    // Generate index.d.ts (type re-exports)
+    // sort so order is stable and not affected by backend response order
+    indexExports.sort();
+    const indexDtsContent = indexExports.join("\n");
+    fs.writeFileSync(CONFIG.indexDtsFile, indexDtsContent);
 
-		if (failCount > 0) {
-			console.warn('⚠️  Some types failed to generate. Check logs above.');
-			process.exit(1);
-		}
-	} catch (err) {
-		console.error('❌ Fatal error during sync:', err);
-		process.exit(1);
-	}
+    // Generate index.js (runtime re-exports, resolves to empty modules)
+    fs.writeFileSync(CONFIG.indexJsFile, indexDtsContent);
+
+    console.log("\n=============================================");
+    console.log(`✅ Sync Completed!`);
+    console.log(`   - Success: ${successCount}`);
+    console.log(`   - Failed:  ${failCount}`);
+    console.log(`   - Output:  ${CONFIG.indexDtsFile}`);
+    console.log("=============================================");
+
+    if (failCount > 0) {
+      console.warn("⚠️  Some types failed to generate. Check logs above.");
+      process.exit(1);
+    }
+  } catch (err) {
+    console.error("❌ Fatal error during sync:", err);
+    process.exit(1);
+  }
 }
 
 main();

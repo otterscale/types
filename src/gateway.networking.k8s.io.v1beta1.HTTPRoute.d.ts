@@ -8,208 +8,6 @@
  */
 export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
   /**
-   * Status defines the current state of HTTPRoute.
-   */
-  status?: {
-    /**
-     * Parents is a list of parent resources (usually Gateways) that are
-     * associated with the route, and the status of the route with respect to
-     * each parent. When this route attaches to a parent, the controller that
-     * manages the parent must add an entry to this list when the controller
-     * first sees the route and should update the entry as appropriate when the
-     * route or gateway is modified.
-     *
-     * Note that parent references that cannot be resolved by an implementation
-     * of this API will not be added to this list. Implementations of this API
-     * can only populate Route status for the Gateways/parent resources they are
-     * responsible for.
-     *
-     * A maximum of 32 Gateways will be represented in this list. An empty list
-     * means the route has not been attached to any Gateway.
-     *
-     * @maxItems 32
-     */
-    parents: {
-      /**
-       * Conditions describes the status of the route with respect to the Gateway.
-       * Note that the route's availability is also subject to the Gateway's own
-       * status conditions and listener status.
-       *
-       * If the Route's ParentRef specifies an existing Gateway that supports
-       * Routes of this kind AND that Gateway's controller has sufficient access,
-       * then that Gateway's controller MUST set the "Accepted" condition on the
-       * Route, to indicate whether the route has been accepted or rejected by the
-       * Gateway, and why.
-       *
-       * A Route MUST be considered "Accepted" if at least one of the Route's
-       * rules is implemented by the Gateway.
-       *
-       * There are a number of cases where the "Accepted" condition may not be set
-       * due to lack of controller visibility, that includes when:
-       *
-       * * The Route refers to a nonexistent parent.
-       * * The Route is of a type that the controller does not support.
-       * * The Route is in a namespace the controller does not have access to.
-       *
-       * @minItems 1
-       * @maxItems 8
-       */
-      conditions: {
-        /**
-         * message is a human readable message indicating details about the transition.
-         * This may be an empty string.
-         */
-        message: string;
-        /**
-         * observedGeneration represents the .metadata.generation that the condition was set based upon.
-         * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
-         * with respect to the current state of the instance.
-         */
-        observedGeneration?: number;
-        /**
-         * reason contains a programmatic identifier indicating the reason for the condition's last transition.
-         * Producers of specific condition types may define expected values and meanings for this field,
-         * and whether the values are considered a guaranteed API.
-         * The value should be a CamelCase string.
-         * This field may not be empty.
-         */
-        reason: string;
-        /**
-         * status of the condition, one of True, False, Unknown.
-         */
-        status: 'True' | 'False' | 'Unknown';
-        /**
-         * type of condition in CamelCase or in foo.example.com/CamelCase.
-         */
-        type: string;
-        /**
-         * lastTransitionTime is the last time the condition transitioned from one status to another.
-         * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
-         */
-        lastTransitionTime: string;
-        [k: string]: unknown;
-      }[];
-      /**
-       * ControllerName is a domain/path string that indicates the name of the
-       * controller that wrote this status. This corresponds with the
-       * controllerName field on GatewayClass.
-       *
-       * Example: "example.net/gateway-controller".
-       *
-       * The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
-       * valid Kubernetes names
-       * (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
-       *
-       * Controllers MUST populate this field when writing status. Controllers should ensure that
-       * entries to status populated with their ControllerName are cleaned up when they are no
-       * longer necessary.
-       */
-      controllerName: string;
-      /**
-       * ParentRef corresponds with a ParentRef in the spec that this
-       * RouteParentStatus struct describes the status of.
-       */
-      parentRef: {
-        /**
-         * SectionName is the name of a section within the target resource. In the
-         * following resources, SectionName is interpreted as the following:
-         *
-         * * Gateway: Listener name. When both Port (experimental) and SectionName
-         * are specified, the name and port of the selected listener must match
-         * both specified values.
-         * * Service: Port name. When both Port (experimental) and SectionName
-         * are specified, the name and port of the selected listener must match
-         * both specified values.
-         *
-         * Implementations MAY choose to support attaching Routes to other resources.
-         * If that is the case, they MUST clearly document how SectionName is
-         * interpreted.
-         *
-         * When unspecified (empty string), this will reference the entire resource.
-         * For the purpose of status, an attachment is considered successful if at
-         * least one section in the parent resource accepts it. For example, Gateway
-         * listeners can restrict which Routes can attach to them by Route kind,
-         * namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
-         * the referencing Route, the Route MUST be considered successfully
-         * attached. If no Gateway listeners accept attachment from this Route, the
-         * Route MUST be considered detached from the Gateway.
-         *
-         * Support: Core
-         */
-        sectionName?: string;
-        /**
-         * Group is the group of the referent.
-         * When unspecified, "gateway.networking.k8s.io" is inferred.
-         * To set the core API group (such as for a "Service" kind referent),
-         * Group must be explicitly set to "" (empty string).
-         *
-         * Support: Core
-         */
-        group?: string;
-        /**
-         * Kind is kind of the referent.
-         *
-         * There are two kinds of parent resources with "Core" support:
-         *
-         * * Gateway (Gateway conformance profile)
-         * * Service (Mesh conformance profile, ClusterIP Services only)
-         *
-         * Support for other resources is Implementation-Specific.
-         */
-        kind?: string;
-        /**
-         * Name is the name of the referent.
-         *
-         * Support: Core
-         */
-        name: string;
-        /**
-         * Namespace is the namespace of the referent. When unspecified, this refers
-         * to the local namespace of the Route.
-         *
-         * Note that there are specific rules for ParentRefs which cross namespace
-         * boundaries. Cross-namespace references are only valid if they are explicitly
-         * allowed by something in the namespace they are referring to. For example:
-         * Gateway has the AllowedRoutes field, and ReferenceGrant provides a
-         * generic way to enable any other kind of cross-namespace reference.
-         *
-         * Support: Core
-         */
-        namespace?: string;
-        /**
-         * Port is the network port this Route targets. It can be interpreted
-         * differently based on the type of parent resource.
-         *
-         * When the parent resource is a Gateway, this targets all listeners
-         * listening on the specified port that also support this kind of Route(and
-         * select this Route). It's not recommended to set `Port` unless the
-         * networking behaviors specified in a Route must apply to a specific port
-         * as opposed to a listener(s) whose port(s) may be changed. When both Port
-         * and SectionName are specified, the name and port of the selected listener
-         * must match both specified values.
-         *
-         * Implementations MAY choose to support other parent resources.
-         * Implementations supporting other types of parent resources MUST clearly
-         * document how/if Port is interpreted.
-         *
-         * For the purpose of status, an attachment is considered successful as
-         * long as the parent resource accepts it partially. For example, Gateway
-         * listeners can restrict which Routes can attach to them by Route kind,
-         * namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
-         * from the referencing Route, the Route MUST be considered successfully
-         * attached. If no Gateway listeners accept attachment from this Route,
-         * the Route MUST be considered detached from the Gateway.
-         *
-         * Support: Extended
-         */
-        port?: number;
-        [k: string]: unknown;
-      };
-      [k: string]: unknown;
-    }[];
-    [k: string]: unknown;
-  };
-  /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
   apiVersion?: string;
@@ -228,24 +26,6 @@ export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
       [k: string]: string;
     };
     /**
-     * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
-     *
-     * If this field is specified and the generated name exists, the server will return a 409.
-     *
-     * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
-     */
-    generateName?: string;
-    /**
-     * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
-     *
-     * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
-     */
-    namespace?: string;
-    /**
-     * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
-     */
-    selfLink?: string;
-    /**
      * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
      */
     creationTimestamp?: string;
@@ -253,6 +33,22 @@ export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
      * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
      */
     deletionGracePeriodSeconds?: number;
+    /**
+     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+     */
+    deletionTimestamp?: string;
+    /**
+     * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
+     */
+    finalizers?: string[];
+    /**
+     * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
+     *
+     * If this field is specified and the generated name exists, the server will return a 409.
+     *
+     * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
+     */
+    generateName?: string;
     /**
      * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
      */
@@ -263,54 +59,6 @@ export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
     labels?: {
       [k: string]: string;
     };
-    /**
-     * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
-     */
-    name?: string;
-    /**
-     * UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.
-     *
-     * Populated by the system. Read-only. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
-     */
-    uid?: string;
-    /**
-     * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
-     */
-    finalizers?: string[];
-    /**
-     * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
-     */
-    ownerReferences?: {
-      /**
-       * API version of the referent.
-       */
-      apiVersion: string;
-      /**
-       * If true, AND if the owner has the "foregroundDeletion" finalizer, then the owner cannot be deleted from the key-value store until this reference is removed. See https://kubernetes.io/docs/concepts/architecture/garbage-collection/#foreground-deletion for how the garbage collector interacts with this field and enforces the foreground deletion. Defaults to false. To set this field, a user needs "delete" permission of the owner, otherwise 422 (Unprocessable Entity) will be returned.
-       */
-      blockOwnerDeletion?: boolean;
-      /**
-       * If true, this reference points to the managing controller.
-       */
-      controller?: boolean;
-      /**
-       * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-       */
-      kind: string;
-      /**
-       * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
-       */
-      name: string;
-      /**
-       * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
-       */
-      uid: string;
-      [k: string]: unknown;
-    }[];
-    /**
-     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-     */
-    deletionTimestamp?: string;
     /**
      * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
      */
@@ -352,11 +100,61 @@ export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
       [k: string]: unknown;
     }[];
     /**
+     * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+     */
+    name?: string;
+    /**
+     * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
+     *
+     * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
+     */
+    namespace?: string;
+    /**
+     * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
+     */
+    ownerReferences?: {
+      /**
+       * API version of the referent.
+       */
+      apiVersion: string;
+      /**
+       * If true, AND if the owner has the "foregroundDeletion" finalizer, then the owner cannot be deleted from the key-value store until this reference is removed. See https://kubernetes.io/docs/concepts/architecture/garbage-collection/#foreground-deletion for how the garbage collector interacts with this field and enforces the foreground deletion. Defaults to false. To set this field, a user needs "delete" permission of the owner, otherwise 422 (Unprocessable Entity) will be returned.
+       */
+      blockOwnerDeletion?: boolean;
+      /**
+       * If true, this reference points to the managing controller.
+       */
+      controller?: boolean;
+      /**
+       * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+       */
+      kind: string;
+      /**
+       * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+       */
+      name: string;
+      /**
+       * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+       */
+      uid: string;
+      [k: string]: unknown;
+    }[];
+    /**
      * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
      *
      * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
      */
     resourceVersion?: string;
+    /**
+     * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+     */
+    selfLink?: string;
+    /**
+     * UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.
+     *
+     * Populated by the system. Read-only. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+     */
+    uid?: string;
     [k: string]: unknown;
   };
   /**
@@ -627,6 +425,138 @@ export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
          * @maxItems 16
          */
         filters?: {
+          /**
+           * ExtensionRef is an optional, implementation-specific extension to the
+           * "filter" behavior.  For example, resource "myroutefilter" in group
+           * "networking.example.net"). ExtensionRef MUST NOT be used for core and
+           * extended filters.
+           *
+           * This filter can be used multiple times within the same rule.
+           *
+           * Support: Implementation-specific
+           */
+          extensionRef?: {
+            /**
+             * Group is the group of the referent. For example, "gateway.networking.k8s.io".
+             * When unspecified or empty string, core API group is inferred.
+             */
+            group: string;
+            /**
+             * Kind is kind of the referent. For example "HTTPRoute" or "Service".
+             */
+            kind: string;
+            /**
+             * Name is the name of the referent.
+             */
+            name: string;
+            [k: string]: unknown;
+          };
+          /**
+           * RequestHeaderModifier defines a schema for a filter that modifies request
+           * headers.
+           *
+           * Support: Core
+           */
+          requestHeaderModifier?: {
+            /**
+             * Add adds the given header(s) (name, value) to the request
+             * before the action. It appends to any existing values associated
+             * with the header name.
+             *
+             * Input:
+             *   GET /foo HTTP/1.1
+             *   my-header: foo
+             *
+             * Config:
+             *   add:
+             *   - name: "my-header"
+             *     value: "bar,baz"
+             *
+             * Output:
+             *   GET /foo HTTP/1.1
+             *   my-header: foo,bar,baz
+             *
+             * @maxItems 16
+             */
+            add?: {
+              /**
+               * Name is the name of the HTTP Header to be matched. Name matching MUST be
+               * case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+               *
+               * If multiple entries specify equivalent header names, the first entry with
+               * an equivalent name MUST be considered for a match. Subsequent entries
+               * with an equivalent header name MUST be ignored. Due to the
+               * case-insensitivity of header names, "foo" and "Foo" are considered
+               * equivalent.
+               */
+              name: string;
+              /**
+               * Value is the value of HTTP Header to be matched.
+               */
+              value: string;
+              [k: string]: unknown;
+            }[];
+            /**
+             * Remove the given header(s) from the HTTP request before the action. The
+             * value of Remove is a list of HTTP header names. Note that the header
+             * names are case-insensitive (see
+             * https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).
+             *
+             * Input:
+             *   GET /foo HTTP/1.1
+             *   my-header1: foo
+             *   my-header2: bar
+             *   my-header3: baz
+             *
+             * Config:
+             *   remove: ["my-header1", "my-header3"]
+             *
+             * Output:
+             *   GET /foo HTTP/1.1
+             *   my-header2: bar
+             *
+             * @maxItems 16
+             */
+            remove?: string[];
+            /**
+             * Set overwrites the request with the given header (name, value)
+             * before the action.
+             *
+             * Input:
+             *   GET /foo HTTP/1.1
+             *   my-header: foo
+             *
+             * Config:
+             *   set:
+             *   - name: "my-header"
+             *     value: "bar"
+             *
+             * Output:
+             *   GET /foo HTTP/1.1
+             *   my-header: bar
+             *
+             * @maxItems 16
+             */
+            set?: {
+              /**
+               * Name is the name of the HTTP Header to be matched. Name matching MUST be
+               * case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+               *
+               * If multiple entries specify equivalent header names, the first entry with
+               * an equivalent name MUST be considered for a match. Subsequent entries
+               * with an equivalent header name MUST be ignored. Due to the
+               * case-insensitivity of header names, "foo" and "Foo" are considered
+               * equivalent.
+               */
+              name: string;
+              /**
+               * Value is the value of HTTP Header to be matched.
+               */
+              value: string;
+              [k: string]: unknown;
+            }[];
+            [k: string]: unknown;
+          };
           /**
            * RequestMirror defines a schema for a filter that mirrors requests.
            * Requests are sent to the specified destination, but responses from
@@ -1008,6 +938,13 @@ export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
            */
           urlRewrite?: {
             /**
+             * Hostname is the value to be used to replace the Host header value during
+             * forwarding.
+             *
+             * Support: Extended
+             */
+            hostname?: string;
+            /**
              * Path defines a path rewrite.
              *
              * Support: Extended
@@ -1051,145 +988,6 @@ export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
               type: 'ReplaceFullPath' | 'ReplacePrefixMatch';
               [k: string]: unknown;
             };
-            /**
-             * Hostname is the value to be used to replace the Host header value during
-             * forwarding.
-             *
-             * Support: Extended
-             */
-            hostname?: string;
-            [k: string]: unknown;
-          };
-          /**
-           * ExtensionRef is an optional, implementation-specific extension to the
-           * "filter" behavior.  For example, resource "myroutefilter" in group
-           * "networking.example.net"). ExtensionRef MUST NOT be used for core and
-           * extended filters.
-           *
-           * This filter can be used multiple times within the same rule.
-           *
-           * Support: Implementation-specific
-           */
-          extensionRef?: {
-            /**
-             * Group is the group of the referent. For example, "gateway.networking.k8s.io".
-             * When unspecified or empty string, core API group is inferred.
-             */
-            group: string;
-            /**
-             * Kind is kind of the referent. For example "HTTPRoute" or "Service".
-             */
-            kind: string;
-            /**
-             * Name is the name of the referent.
-             */
-            name: string;
-            [k: string]: unknown;
-          };
-          /**
-           * RequestHeaderModifier defines a schema for a filter that modifies request
-           * headers.
-           *
-           * Support: Core
-           */
-          requestHeaderModifier?: {
-            /**
-             * Add adds the given header(s) (name, value) to the request
-             * before the action. It appends to any existing values associated
-             * with the header name.
-             *
-             * Input:
-             *   GET /foo HTTP/1.1
-             *   my-header: foo
-             *
-             * Config:
-             *   add:
-             *   - name: "my-header"
-             *     value: "bar,baz"
-             *
-             * Output:
-             *   GET /foo HTTP/1.1
-             *   my-header: foo,bar,baz
-             *
-             * @maxItems 16
-             */
-            add?: {
-              /**
-               * Name is the name of the HTTP Header to be matched. Name matching MUST be
-               * case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
-               *
-               * If multiple entries specify equivalent header names, the first entry with
-               * an equivalent name MUST be considered for a match. Subsequent entries
-               * with an equivalent header name MUST be ignored. Due to the
-               * case-insensitivity of header names, "foo" and "Foo" are considered
-               * equivalent.
-               */
-              name: string;
-              /**
-               * Value is the value of HTTP Header to be matched.
-               */
-              value: string;
-              [k: string]: unknown;
-            }[];
-            /**
-             * Remove the given header(s) from the HTTP request before the action. The
-             * value of Remove is a list of HTTP header names. Note that the header
-             * names are case-insensitive (see
-             * https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).
-             *
-             * Input:
-             *   GET /foo HTTP/1.1
-             *   my-header1: foo
-             *   my-header2: bar
-             *   my-header3: baz
-             *
-             * Config:
-             *   remove: ["my-header1", "my-header3"]
-             *
-             * Output:
-             *   GET /foo HTTP/1.1
-             *   my-header2: bar
-             *
-             * @maxItems 16
-             */
-            remove?: string[];
-            /**
-             * Set overwrites the request with the given header (name, value)
-             * before the action.
-             *
-             * Input:
-             *   GET /foo HTTP/1.1
-             *   my-header: foo
-             *
-             * Config:
-             *   set:
-             *   - name: "my-header"
-             *     value: "bar"
-             *
-             * Output:
-             *   GET /foo HTTP/1.1
-             *   my-header: bar
-             *
-             * @maxItems 16
-             */
-            set?: {
-              /**
-               * Value is the value of HTTP Header to be matched.
-               */
-              value: string;
-              /**
-               * Name is the name of the HTTP Header to be matched. Name matching MUST be
-               * case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
-               *
-               * If multiple entries specify equivalent header names, the first entry with
-               * an equivalent name MUST be considered for a match. Subsequent entries
-               * with an equivalent header name MUST be ignored. Due to the
-               * case-insensitivity of header names, "foo" and "Foo" are considered
-               * equivalent.
-               */
-              name: string;
-              [k: string]: unknown;
-            }[];
             [k: string]: unknown;
           };
           [k: string]: unknown;
@@ -1300,12 +1098,307 @@ export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
        */
       filters?: {
         /**
+         * ExtensionRef is an optional, implementation-specific extension to the
+         * "filter" behavior.  For example, resource "myroutefilter" in group
+         * "networking.example.net"). ExtensionRef MUST NOT be used for core and
+         * extended filters.
+         *
+         * This filter can be used multiple times within the same rule.
+         *
+         * Support: Implementation-specific
+         */
+        extensionRef?: {
+          /**
+           * Group is the group of the referent. For example, "gateway.networking.k8s.io".
+           * When unspecified or empty string, core API group is inferred.
+           */
+          group: string;
+          /**
+           * Kind is kind of the referent. For example "HTTPRoute" or "Service".
+           */
+          kind: string;
+          /**
+           * Name is the name of the referent.
+           */
+          name: string;
+          [k: string]: unknown;
+        };
+        /**
+         * RequestHeaderModifier defines a schema for a filter that modifies request
+         * headers.
+         *
+         * Support: Core
+         */
+        requestHeaderModifier?: {
+          /**
+           * Add adds the given header(s) (name, value) to the request
+           * before the action. It appends to any existing values associated
+           * with the header name.
+           *
+           * Input:
+           *   GET /foo HTTP/1.1
+           *   my-header: foo
+           *
+           * Config:
+           *   add:
+           *   - name: "my-header"
+           *     value: "bar,baz"
+           *
+           * Output:
+           *   GET /foo HTTP/1.1
+           *   my-header: foo,bar,baz
+           *
+           * @maxItems 16
+           */
+          add?: {
+            /**
+             * Name is the name of the HTTP Header to be matched. Name matching MUST be
+             * case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+             *
+             * If multiple entries specify equivalent header names, the first entry with
+             * an equivalent name MUST be considered for a match. Subsequent entries
+             * with an equivalent header name MUST be ignored. Due to the
+             * case-insensitivity of header names, "foo" and "Foo" are considered
+             * equivalent.
+             */
+            name: string;
+            /**
+             * Value is the value of HTTP Header to be matched.
+             */
+            value: string;
+            [k: string]: unknown;
+          }[];
+          /**
+           * Remove the given header(s) from the HTTP request before the action. The
+           * value of Remove is a list of HTTP header names. Note that the header
+           * names are case-insensitive (see
+           * https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).
+           *
+           * Input:
+           *   GET /foo HTTP/1.1
+           *   my-header1: foo
+           *   my-header2: bar
+           *   my-header3: baz
+           *
+           * Config:
+           *   remove: ["my-header1", "my-header3"]
+           *
+           * Output:
+           *   GET /foo HTTP/1.1
+           *   my-header2: bar
+           *
+           * @maxItems 16
+           */
+          remove?: string[];
+          /**
+           * Set overwrites the request with the given header (name, value)
+           * before the action.
+           *
+           * Input:
+           *   GET /foo HTTP/1.1
+           *   my-header: foo
+           *
+           * Config:
+           *   set:
+           *   - name: "my-header"
+           *     value: "bar"
+           *
+           * Output:
+           *   GET /foo HTTP/1.1
+           *   my-header: bar
+           *
+           * @maxItems 16
+           */
+          set?: {
+            /**
+             * Name is the name of the HTTP Header to be matched. Name matching MUST be
+             * case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+             *
+             * If multiple entries specify equivalent header names, the first entry with
+             * an equivalent name MUST be considered for a match. Subsequent entries
+             * with an equivalent header name MUST be ignored. Due to the
+             * case-insensitivity of header names, "foo" and "Foo" are considered
+             * equivalent.
+             */
+            name: string;
+            /**
+             * Value is the value of HTTP Header to be matched.
+             */
+            value: string;
+            [k: string]: unknown;
+          }[];
+          [k: string]: unknown;
+        };
+        /**
+         * RequestMirror defines a schema for a filter that mirrors requests.
+         * Requests are sent to the specified destination, but responses from
+         * that destination are ignored.
+         *
+         * This filter can be used multiple times within the same rule. Note that
+         * not all implementations will be able to support mirroring to multiple
+         * backends.
+         *
+         * Support: Extended
+         */
+        requestMirror?: {
+          /**
+           * BackendRef references a resource where mirrored requests are sent.
+           *
+           * Mirrored requests must be sent only to a single destination endpoint
+           * within this BackendRef, irrespective of how many endpoints are present
+           * within this BackendRef.
+           *
+           * If the referent cannot be found, this BackendRef is invalid and must be
+           * dropped from the Gateway. The controller must ensure the "ResolvedRefs"
+           * condition on the Route status is set to `status: False` and not configure
+           * this backend in the underlying implementation.
+           *
+           * If there is a cross-namespace reference to an *existing* object
+           * that is not allowed by a ReferenceGrant, the controller must ensure the
+           * "ResolvedRefs"  condition on the Route is set to `status: False`,
+           * with the "RefNotPermitted" reason and not configure this backend in the
+           * underlying implementation.
+           *
+           * In either error case, the Message of the `ResolvedRefs` Condition
+           * should be used to provide more detail about the problem.
+           *
+           * Support: Extended for Kubernetes Service
+           *
+           * Support: Implementation-specific for any other resource
+           */
+          backendRef: {
+            /**
+             * Group is the group of the referent. For example, "gateway.networking.k8s.io".
+             * When unspecified or empty string, core API group is inferred.
+             */
+            group?: string;
+            /**
+             * Kind is the Kubernetes resource kind of the referent. For example
+             * "Service".
+             *
+             * Defaults to "Service" when not specified.
+             *
+             * ExternalName services can refer to CNAME DNS records that may live
+             * outside of the cluster and as such are difficult to reason about in
+             * terms of conformance. They also may not be safe to forward to (see
+             * CVE-2021-25740 for more information). Implementations SHOULD NOT
+             * support ExternalName Services.
+             *
+             * Support: Core (Services with a type other than ExternalName)
+             *
+             * Support: Implementation-specific (Services with type ExternalName)
+             */
+            kind?: string;
+            /**
+             * Name is the name of the referent.
+             */
+            name: string;
+            /**
+             * Namespace is the namespace of the backend. When unspecified, the local
+             * namespace is inferred.
+             *
+             * Note that when a namespace different than the local namespace is specified,
+             * a ReferenceGrant object is required in the referent namespace to allow that
+             * namespace's owner to accept the reference. See the ReferenceGrant
+             * documentation for details.
+             *
+             * Support: Core
+             */
+            namespace?: string;
+            /**
+             * Port specifies the destination port number to use for this resource.
+             * Port is required when the referent is a Kubernetes Service. In this
+             * case, the port number is the service port number, not the target port.
+             * For other resources, destination port might be derived from the referent
+             * resource or this field.
+             */
+            port?: number;
+            [k: string]: unknown;
+          };
+          /**
+           * Fraction represents the fraction of requests that should be
+           * mirrored to BackendRef.
+           *
+           * Only one of Fraction or Percent may be specified. If neither field
+           * is specified, 100% of requests will be mirrored.
+           */
+          fraction?: {
+            denominator?: number;
+            numerator: number;
+            [k: string]: unknown;
+          };
+          /**
+           * Percent represents the percentage of requests that should be
+           * mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
+           * requests) and its maximum value is 100 (indicating 100% of requests).
+           *
+           * Only one of Fraction or Percent may be specified. If neither field
+           * is specified, 100% of requests will be mirrored.
+           */
+          percent?: number;
+          [k: string]: unknown;
+        };
+        /**
          * RequestRedirect defines a schema for a filter that responds to the
          * request with an HTTP redirection.
          *
          * Support: Core
          */
         requestRedirect?: {
+          /**
+           * Hostname is the hostname to be used in the value of the `Location`
+           * header in the response.
+           * When empty, the hostname in the `Host` header of the request is used.
+           *
+           * Support: Core
+           */
+          hostname?: string;
+          /**
+           * Path defines parameters used to modify the path of the incoming request.
+           * The modified path is then used to construct the `Location` header. When
+           * empty, the request path is used as-is.
+           *
+           * Support: Extended
+           */
+          path?: {
+            /**
+             * ReplaceFullPath specifies the value with which to replace the full path
+             * of a request during a rewrite or redirect.
+             */
+            replaceFullPath?: string;
+            /**
+             * ReplacePrefixMatch specifies the value with which to replace the prefix
+             * match of a request during a rewrite or redirect. For example, a request
+             * to "/foo/bar" with a prefix match of "/foo" and a ReplacePrefixMatch
+             * of "/xyz" would be modified to "/xyz/bar".
+             *
+             * Note that this matches the behavior of the PathPrefix match type. This
+             * matches full path elements. A path element refers to the list of labels
+             * in the path split by the `/` separator. When specified, a trailing `/` is
+             * ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
+             * match the prefix `/abc`, but the path `/abcd` would not.
+             *
+             * ReplacePrefixMatch is only compatible with a `PathPrefix` HTTPRouteMatch.
+             * Using any other HTTPRouteMatch type on the same HTTPRouteRule will result in
+             * the implementation setting the Accepted Condition for the Route to `status: False`.
+             *
+             * Request Path | Prefix Match | Replace Prefix | Modified Path
+             */
+            replacePrefixMatch?: string;
+            /**
+             * Type defines the type of path modifier. Additional types may be
+             * added in a future release of the API.
+             *
+             * Note that values may be added to this enum, implementations
+             * must ensure that unknown values will not cause a crash.
+             *
+             * Unknown values here must result in the implementation setting the
+             * Accepted Condition for the Route to `status: False`, with a
+             * Reason of `UnsupportedValue`.
+             */
+            type: 'ReplaceFullPath' | 'ReplacePrefixMatch';
+            [k: string]: unknown;
+          };
           /**
            * Port is the port to be used in the value of the `Location`
            * header in the response.
@@ -1361,60 +1454,6 @@ export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
            * Support: Core
            */
           statusCode?: 301 | 302;
-          /**
-           * Hostname is the hostname to be used in the value of the `Location`
-           * header in the response.
-           * When empty, the hostname in the `Host` header of the request is used.
-           *
-           * Support: Core
-           */
-          hostname?: string;
-          /**
-           * Path defines parameters used to modify the path of the incoming request.
-           * The modified path is then used to construct the `Location` header. When
-           * empty, the request path is used as-is.
-           *
-           * Support: Extended
-           */
-          path?: {
-            /**
-             * ReplaceFullPath specifies the value with which to replace the full path
-             * of a request during a rewrite or redirect.
-             */
-            replaceFullPath?: string;
-            /**
-             * ReplacePrefixMatch specifies the value with which to replace the prefix
-             * match of a request during a rewrite or redirect. For example, a request
-             * to "/foo/bar" with a prefix match of "/foo" and a ReplacePrefixMatch
-             * of "/xyz" would be modified to "/xyz/bar".
-             *
-             * Note that this matches the behavior of the PathPrefix match type. This
-             * matches full path elements. A path element refers to the list of labels
-             * in the path split by the `/` separator. When specified, a trailing `/` is
-             * ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
-             * match the prefix `/abc`, but the path `/abcd` would not.
-             *
-             * ReplacePrefixMatch is only compatible with a `PathPrefix` HTTPRouteMatch.
-             * Using any other HTTPRouteMatch type on the same HTTPRouteRule will result in
-             * the implementation setting the Accepted Condition for the Route to `status: False`.
-             *
-             * Request Path | Prefix Match | Replace Prefix | Modified Path
-             */
-            replacePrefixMatch?: string;
-            /**
-             * Type defines the type of path modifier. Additional types may be
-             * added in a future release of the API.
-             *
-             * Note that values may be added to this enum, implementations
-             * must ensure that unknown values will not cause a crash.
-             *
-             * Unknown values here must result in the implementation setting the
-             * Accepted Condition for the Route to `status: False`, with a
-             * Reason of `UnsupportedValue`.
-             */
-            type: 'ReplaceFullPath' | 'ReplacePrefixMatch';
-            [k: string]: unknown;
-          };
           [k: string]: unknown;
         };
         /**
@@ -1621,247 +1660,6 @@ export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
             type: 'ReplaceFullPath' | 'ReplacePrefixMatch';
             [k: string]: unknown;
           };
-          [k: string]: unknown;
-        };
-        /**
-         * ExtensionRef is an optional, implementation-specific extension to the
-         * "filter" behavior.  For example, resource "myroutefilter" in group
-         * "networking.example.net"). ExtensionRef MUST NOT be used for core and
-         * extended filters.
-         *
-         * This filter can be used multiple times within the same rule.
-         *
-         * Support: Implementation-specific
-         */
-        extensionRef?: {
-          /**
-           * Group is the group of the referent. For example, "gateway.networking.k8s.io".
-           * When unspecified or empty string, core API group is inferred.
-           */
-          group: string;
-          /**
-           * Kind is kind of the referent. For example "HTTPRoute" or "Service".
-           */
-          kind: string;
-          /**
-           * Name is the name of the referent.
-           */
-          name: string;
-          [k: string]: unknown;
-        };
-        /**
-         * RequestHeaderModifier defines a schema for a filter that modifies request
-         * headers.
-         *
-         * Support: Core
-         */
-        requestHeaderModifier?: {
-          /**
-           * Add adds the given header(s) (name, value) to the request
-           * before the action. It appends to any existing values associated
-           * with the header name.
-           *
-           * Input:
-           *   GET /foo HTTP/1.1
-           *   my-header: foo
-           *
-           * Config:
-           *   add:
-           *   - name: "my-header"
-           *     value: "bar,baz"
-           *
-           * Output:
-           *   GET /foo HTTP/1.1
-           *   my-header: foo,bar,baz
-           *
-           * @maxItems 16
-           */
-          add?: {
-            /**
-             * Name is the name of the HTTP Header to be matched. Name matching MUST be
-             * case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
-             *
-             * If multiple entries specify equivalent header names, the first entry with
-             * an equivalent name MUST be considered for a match. Subsequent entries
-             * with an equivalent header name MUST be ignored. Due to the
-             * case-insensitivity of header names, "foo" and "Foo" are considered
-             * equivalent.
-             */
-            name: string;
-            /**
-             * Value is the value of HTTP Header to be matched.
-             */
-            value: string;
-            [k: string]: unknown;
-          }[];
-          /**
-           * Remove the given header(s) from the HTTP request before the action. The
-           * value of Remove is a list of HTTP header names. Note that the header
-           * names are case-insensitive (see
-           * https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).
-           *
-           * Input:
-           *   GET /foo HTTP/1.1
-           *   my-header1: foo
-           *   my-header2: bar
-           *   my-header3: baz
-           *
-           * Config:
-           *   remove: ["my-header1", "my-header3"]
-           *
-           * Output:
-           *   GET /foo HTTP/1.1
-           *   my-header2: bar
-           *
-           * @maxItems 16
-           */
-          remove?: string[];
-          /**
-           * Set overwrites the request with the given header (name, value)
-           * before the action.
-           *
-           * Input:
-           *   GET /foo HTTP/1.1
-           *   my-header: foo
-           *
-           * Config:
-           *   set:
-           *   - name: "my-header"
-           *     value: "bar"
-           *
-           * Output:
-           *   GET /foo HTTP/1.1
-           *   my-header: bar
-           *
-           * @maxItems 16
-           */
-          set?: {
-            /**
-             * Value is the value of HTTP Header to be matched.
-             */
-            value: string;
-            /**
-             * Name is the name of the HTTP Header to be matched. Name matching MUST be
-             * case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
-             *
-             * If multiple entries specify equivalent header names, the first entry with
-             * an equivalent name MUST be considered for a match. Subsequent entries
-             * with an equivalent header name MUST be ignored. Due to the
-             * case-insensitivity of header names, "foo" and "Foo" are considered
-             * equivalent.
-             */
-            name: string;
-            [k: string]: unknown;
-          }[];
-          [k: string]: unknown;
-        };
-        /**
-         * RequestMirror defines a schema for a filter that mirrors requests.
-         * Requests are sent to the specified destination, but responses from
-         * that destination are ignored.
-         *
-         * This filter can be used multiple times within the same rule. Note that
-         * not all implementations will be able to support mirroring to multiple
-         * backends.
-         *
-         * Support: Extended
-         */
-        requestMirror?: {
-          /**
-           * BackendRef references a resource where mirrored requests are sent.
-           *
-           * Mirrored requests must be sent only to a single destination endpoint
-           * within this BackendRef, irrespective of how many endpoints are present
-           * within this BackendRef.
-           *
-           * If the referent cannot be found, this BackendRef is invalid and must be
-           * dropped from the Gateway. The controller must ensure the "ResolvedRefs"
-           * condition on the Route status is set to `status: False` and not configure
-           * this backend in the underlying implementation.
-           *
-           * If there is a cross-namespace reference to an *existing* object
-           * that is not allowed by a ReferenceGrant, the controller must ensure the
-           * "ResolvedRefs"  condition on the Route is set to `status: False`,
-           * with the "RefNotPermitted" reason and not configure this backend in the
-           * underlying implementation.
-           *
-           * In either error case, the Message of the `ResolvedRefs` Condition
-           * should be used to provide more detail about the problem.
-           *
-           * Support: Extended for Kubernetes Service
-           *
-           * Support: Implementation-specific for any other resource
-           */
-          backendRef: {
-            /**
-             * Group is the group of the referent. For example, "gateway.networking.k8s.io".
-             * When unspecified or empty string, core API group is inferred.
-             */
-            group?: string;
-            /**
-             * Kind is the Kubernetes resource kind of the referent. For example
-             * "Service".
-             *
-             * Defaults to "Service" when not specified.
-             *
-             * ExternalName services can refer to CNAME DNS records that may live
-             * outside of the cluster and as such are difficult to reason about in
-             * terms of conformance. They also may not be safe to forward to (see
-             * CVE-2021-25740 for more information). Implementations SHOULD NOT
-             * support ExternalName Services.
-             *
-             * Support: Core (Services with a type other than ExternalName)
-             *
-             * Support: Implementation-specific (Services with type ExternalName)
-             */
-            kind?: string;
-            /**
-             * Name is the name of the referent.
-             */
-            name: string;
-            /**
-             * Namespace is the namespace of the backend. When unspecified, the local
-             * namespace is inferred.
-             *
-             * Note that when a namespace different than the local namespace is specified,
-             * a ReferenceGrant object is required in the referent namespace to allow that
-             * namespace's owner to accept the reference. See the ReferenceGrant
-             * documentation for details.
-             *
-             * Support: Core
-             */
-            namespace?: string;
-            /**
-             * Port specifies the destination port number to use for this resource.
-             * Port is required when the referent is a Kubernetes Service. In this
-             * case, the port number is the service port number, not the target port.
-             * For other resources, destination port might be derived from the referent
-             * resource or this field.
-             */
-            port?: number;
-            [k: string]: unknown;
-          };
-          /**
-           * Fraction represents the fraction of requests that should be
-           * mirrored to BackendRef.
-           *
-           * Only one of Fraction or Percent may be specified. If neither field
-           * is specified, 100% of requests will be mirrored.
-           */
-          fraction?: {
-            numerator: number;
-            denominator?: number;
-            [k: string]: unknown;
-          };
-          /**
-           * Percent represents the percentage of requests that should be
-           * mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
-           * requests) and its maximum value is 100 (indicating 100% of requests).
-           *
-           * Only one of Fraction or Percent may be specified. If neither field
-           * is specified, 100% of requests will be mirrored.
-           */
-          percent?: number;
           [k: string]: unknown;
         };
         [k: string]: unknown;
@@ -2108,6 +1906,208 @@ export interface GatewayNetworkingK8SIoV1Beta1HTTPRoute {
          * Support: Extended
          */
         request?: string;
+        [k: string]: unknown;
+      };
+      [k: string]: unknown;
+    }[];
+    [k: string]: unknown;
+  };
+  /**
+   * Status defines the current state of HTTPRoute.
+   */
+  status?: {
+    /**
+     * Parents is a list of parent resources (usually Gateways) that are
+     * associated with the route, and the status of the route with respect to
+     * each parent. When this route attaches to a parent, the controller that
+     * manages the parent must add an entry to this list when the controller
+     * first sees the route and should update the entry as appropriate when the
+     * route or gateway is modified.
+     *
+     * Note that parent references that cannot be resolved by an implementation
+     * of this API will not be added to this list. Implementations of this API
+     * can only populate Route status for the Gateways/parent resources they are
+     * responsible for.
+     *
+     * A maximum of 32 Gateways will be represented in this list. An empty list
+     * means the route has not been attached to any Gateway.
+     *
+     * @maxItems 32
+     */
+    parents: {
+      /**
+       * Conditions describes the status of the route with respect to the Gateway.
+       * Note that the route's availability is also subject to the Gateway's own
+       * status conditions and listener status.
+       *
+       * If the Route's ParentRef specifies an existing Gateway that supports
+       * Routes of this kind AND that Gateway's controller has sufficient access,
+       * then that Gateway's controller MUST set the "Accepted" condition on the
+       * Route, to indicate whether the route has been accepted or rejected by the
+       * Gateway, and why.
+       *
+       * A Route MUST be considered "Accepted" if at least one of the Route's
+       * rules is implemented by the Gateway.
+       *
+       * There are a number of cases where the "Accepted" condition may not be set
+       * due to lack of controller visibility, that includes when:
+       *
+       * * The Route refers to a nonexistent parent.
+       * * The Route is of a type that the controller does not support.
+       * * The Route is in a namespace the controller does not have access to.
+       *
+       * @minItems 1
+       * @maxItems 8
+       */
+      conditions: {
+        /**
+         * lastTransitionTime is the last time the condition transitioned from one status to another.
+         * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+         */
+        lastTransitionTime: string;
+        /**
+         * message is a human readable message indicating details about the transition.
+         * This may be an empty string.
+         */
+        message: string;
+        /**
+         * observedGeneration represents the .metadata.generation that the condition was set based upon.
+         * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+         * with respect to the current state of the instance.
+         */
+        observedGeneration?: number;
+        /**
+         * reason contains a programmatic identifier indicating the reason for the condition's last transition.
+         * Producers of specific condition types may define expected values and meanings for this field,
+         * and whether the values are considered a guaranteed API.
+         * The value should be a CamelCase string.
+         * This field may not be empty.
+         */
+        reason: string;
+        /**
+         * status of the condition, one of True, False, Unknown.
+         */
+        status: 'True' | 'False' | 'Unknown';
+        /**
+         * type of condition in CamelCase or in foo.example.com/CamelCase.
+         */
+        type: string;
+        [k: string]: unknown;
+      }[];
+      /**
+       * ControllerName is a domain/path string that indicates the name of the
+       * controller that wrote this status. This corresponds with the
+       * controllerName field on GatewayClass.
+       *
+       * Example: "example.net/gateway-controller".
+       *
+       * The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
+       * valid Kubernetes names
+       * (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+       *
+       * Controllers MUST populate this field when writing status. Controllers should ensure that
+       * entries to status populated with their ControllerName are cleaned up when they are no
+       * longer necessary.
+       */
+      controllerName: string;
+      /**
+       * ParentRef corresponds with a ParentRef in the spec that this
+       * RouteParentStatus struct describes the status of.
+       */
+      parentRef: {
+        /**
+         * Group is the group of the referent.
+         * When unspecified, "gateway.networking.k8s.io" is inferred.
+         * To set the core API group (such as for a "Service" kind referent),
+         * Group must be explicitly set to "" (empty string).
+         *
+         * Support: Core
+         */
+        group?: string;
+        /**
+         * Kind is kind of the referent.
+         *
+         * There are two kinds of parent resources with "Core" support:
+         *
+         * * Gateway (Gateway conformance profile)
+         * * Service (Mesh conformance profile, ClusterIP Services only)
+         *
+         * Support for other resources is Implementation-Specific.
+         */
+        kind?: string;
+        /**
+         * Name is the name of the referent.
+         *
+         * Support: Core
+         */
+        name: string;
+        /**
+         * Namespace is the namespace of the referent. When unspecified, this refers
+         * to the local namespace of the Route.
+         *
+         * Note that there are specific rules for ParentRefs which cross namespace
+         * boundaries. Cross-namespace references are only valid if they are explicitly
+         * allowed by something in the namespace they are referring to. For example:
+         * Gateway has the AllowedRoutes field, and ReferenceGrant provides a
+         * generic way to enable any other kind of cross-namespace reference.
+         *
+         * Support: Core
+         */
+        namespace?: string;
+        /**
+         * Port is the network port this Route targets. It can be interpreted
+         * differently based on the type of parent resource.
+         *
+         * When the parent resource is a Gateway, this targets all listeners
+         * listening on the specified port that also support this kind of Route(and
+         * select this Route). It's not recommended to set `Port` unless the
+         * networking behaviors specified in a Route must apply to a specific port
+         * as opposed to a listener(s) whose port(s) may be changed. When both Port
+         * and SectionName are specified, the name and port of the selected listener
+         * must match both specified values.
+         *
+         * Implementations MAY choose to support other parent resources.
+         * Implementations supporting other types of parent resources MUST clearly
+         * document how/if Port is interpreted.
+         *
+         * For the purpose of status, an attachment is considered successful as
+         * long as the parent resource accepts it partially. For example, Gateway
+         * listeners can restrict which Routes can attach to them by Route kind,
+         * namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
+         * from the referencing Route, the Route MUST be considered successfully
+         * attached. If no Gateway listeners accept attachment from this Route,
+         * the Route MUST be considered detached from the Gateway.
+         *
+         * Support: Extended
+         */
+        port?: number;
+        /**
+         * SectionName is the name of a section within the target resource. In the
+         * following resources, SectionName is interpreted as the following:
+         *
+         * * Gateway: Listener name. When both Port (experimental) and SectionName
+         * are specified, the name and port of the selected listener must match
+         * both specified values.
+         * * Service: Port name. When both Port (experimental) and SectionName
+         * are specified, the name and port of the selected listener must match
+         * both specified values.
+         *
+         * Implementations MAY choose to support attaching Routes to other resources.
+         * If that is the case, they MUST clearly document how SectionName is
+         * interpreted.
+         *
+         * When unspecified (empty string), this will reference the entire resource.
+         * For the purpose of status, an attachment is considered successful if at
+         * least one section in the parent resource accepts it. For example, Gateway
+         * listeners can restrict which Routes can attach to them by Route kind,
+         * namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
+         * the referencing Route, the Route MUST be considered successfully
+         * attached. If no Gateway listeners accept attachment from this Route, the
+         * Route MUST be considered detached from the Gateway.
+         *
+         * Support: Core
+         */
+        sectionName?: string;
         [k: string]: unknown;
       };
       [k: string]: unknown;

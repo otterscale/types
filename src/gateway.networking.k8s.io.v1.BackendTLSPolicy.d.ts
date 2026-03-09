@@ -18,9 +18,57 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
    */
   metadata?: {
     /**
+     * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
+     */
+    annotations?: {
+      [k: string]: string;
+    };
+    /**
+     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+     */
+    creationTimestamp?: string;
+    /**
+     * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
+     */
+    deletionGracePeriodSeconds?: number;
+    /**
+     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+     */
+    deletionTimestamp?: string;
+    /**
+     * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
+     */
+    finalizers?: string[];
+    /**
+     * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
+     *
+     * If this field is specified and the generated name exists, the server will return a 409.
+     *
+     * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
+     */
+    generateName?: string;
+    /**
+     * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
+     */
+    generation?: number;
+    /**
+     * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+     */
+    labels?: {
+      [k: string]: string;
+    };
+    /**
      * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
      */
     managedFields?: {
+      /**
+       * APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted.
+       */
+      apiVersion?: string;
+      /**
+       * FieldsType is the discriminator for the different fields format and version. There is currently only one possible value: "FieldsV1"
+       */
+      fieldsType?: string;
       /**
        * FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
        *
@@ -47,24 +95,22 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
        * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
        */
       time?: string;
-      /**
-       * APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted.
-       */
-      apiVersion?: string;
-      /**
-       * FieldsType is the discriminator for the different fields format and version. There is currently only one possible value: "FieldsV1"
-       */
-      fieldsType?: string;
       [k: string]: unknown;
     }[];
+    /**
+     * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+     */
+    name?: string;
+    /**
+     * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
+     *
+     * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
+     */
+    namespace?: string;
     /**
      * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
      */
     ownerReferences?: {
-      /**
-       * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
-       */
-      uid: string;
       /**
        * API version of the referent.
        */
@@ -85,68 +131,22 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
        * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
        */
       name: string;
+      /**
+       * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+       */
+      uid: string;
       [k: string]: unknown;
     }[];
-    /**
-     * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
-     */
-    annotations?: {
-      [k: string]: string;
-    };
-    /**
-     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-     */
-    deletionTimestamp?: string;
-    /**
-     * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
-     */
-    generation?: number;
-    /**
-     * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
-     */
-    finalizers?: string[];
-    /**
-     * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
-     *
-     * If this field is specified and the generated name exists, the server will return a 409.
-     *
-     * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
-     */
-    generateName?: string;
-    /**
-     * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
-     */
-    labels?: {
-      [k: string]: string;
-    };
-    /**
-     * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
-     */
-    selfLink?: string;
-    /**
-     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-     */
-    creationTimestamp?: string;
-    /**
-     * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
-     */
-    deletionGracePeriodSeconds?: number;
-    /**
-     * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
-     */
-    name?: string;
-    /**
-     * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
-     *
-     * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
-     */
-    namespace?: string;
     /**
      * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
      *
      * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
      */
     resourceVersion?: string;
+    /**
+     * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+     */
+    selfLink?: string;
     /**
      * UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.
      *
@@ -160,58 +160,104 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
    */
   spec: {
     /**
+     * Options are a list of key/value pairs to enable extended TLS
+     * configuration for each implementation. For example, configuring the
+     * minimum TLS version or supported cipher suites.
+     *
+     * A set of common keys MAY be defined by the API in the future. To avoid
+     * any ambiguity, implementation-specific definitions MUST use
+     * domain-prefixed names, such as `example.com/my-custom-option`.
+     * Un-prefixed names are reserved for key names defined by Gateway API.
+     *
+     * Support: Implementation-specific
+     */
+    options?: {
+      /**
+       * AnnotationValue is the value of an annotation in Gateway API. This is used
+       * for validation of maps such as TLS options. This roughly matches Kubernetes
+       * annotation validation, although the length validation in that case is based
+       * on the entire size of the annotations struct.
+       */
+      [k: string]: string;
+    };
+    /**
+     * TargetRefs identifies an API object to apply the policy to.
+     * Only Services have Extended support. Implementations MAY support
+     * additional objects, with Implementation Specific support.
+     * Note that this config applies to the entire referenced resource
+     * by default, but this default may change in the future to provide
+     * a more granular application of the policy.
+     *
+     * TargetRefs must be _distinct_. This means either that:
+     *
+     * * They select different targets. If this is the case, then targetRef
+     *   entries are distinct. In terms of fields, this means that the
+     *   multi-part key defined by `group`, `kind`, and `name` must
+     *   be unique across all targetRef entries in the BackendTLSPolicy.
+     * * They select different sectionNames in the same target.
+     *
+     * When more than one BackendTLSPolicy selects the same target and
+     * sectionName, implementations MUST determine precedence using the
+     * following criteria, continuing on ties:
+     *
+     * * The older policy by creation timestamp takes precedence. For
+     *   example, a policy with a creation timestamp of "2021-07-15
+     *   01:02:03" MUST be given precedence over a policy with a
+     *   creation timestamp of "2021-07-15 01:02:04".
+     * * The policy appearing first in alphabetical order by {name}.
+     *   For example, a policy named `bar` is given precedence over a
+     *   policy named `baz`.
+     *
+     * For any BackendTLSPolicy that does not take precedence, the
+     * implementation MUST ensure the `Accepted` Condition is set to
+     * `status: False`, with Reason `Conflicted`.
+     *
+     * Implementations SHOULD NOT support more than one targetRef at this
+     * time. Although the API technically allows for this, the current guidance
+     * for conflict resolution and status handling is lacking. Until that can be
+     * clarified in a future release, the safest approach is to support a single
+     * targetRef.
+     *
+     * Support: Extended for Kubernetes Service
+     *
+     * Support: Implementation-specific for any other resource
+     *
+     * @minItems 1
+     * @maxItems 16
+     */
+    targetRefs: {
+      /**
+       * Group is the group of the target resource.
+       */
+      group: string;
+      /**
+       * Kind is kind of the target resource.
+       */
+      kind: string;
+      /**
+       * Name is the name of the target resource.
+       */
+      name: string;
+      /**
+       * SectionName is the name of a section within the target resource. When
+       * unspecified, this targetRef targets the entire resource. In the following
+       * resources, SectionName is interpreted as the following:
+       *
+       * * Gateway: Listener name
+       * * HTTPRoute: HTTPRouteRule name
+       * * Service: Port name
+       *
+       * If a SectionName is specified, but does not exist on the targeted object,
+       * the Policy must fail to attach, and the policy implementation should record
+       * a `ResolvedRefs` or similar Condition in the Policy's status.
+       */
+      sectionName?: string;
+      [k: string]: unknown;
+    }[];
+    /**
      * Validation contains backend TLS validation configuration.
      */
     validation: {
-      /**
-       * SubjectAltNames contains one or more Subject Alternative Names.
-       * When specified the certificate served from the backend MUST
-       * have at least one Subject Alternate Name matching one of the specified SubjectAltNames.
-       *
-       * Support: Extended
-       *
-       * @maxItems 5
-       */
-      subjectAltNames?: {
-        /**
-         * URI contains Subject Alternative Name specified in a full URI format.
-         * It MUST include both a scheme (e.g., "http" or "ftp") and a scheme-specific-part.
-         * Common values include SPIFFE IDs like "spiffe://mycluster.example.com/ns/myns/sa/svc1sa".
-         * Required when Type is set to URI, ignored otherwise.
-         *
-         * Support: Core
-         */
-        uri?: string;
-        /**
-         * Hostname contains Subject Alternative Name specified in DNS name format.
-         * Required when Type is set to Hostname, ignored otherwise.
-         *
-         * Support: Core
-         */
-        hostname?: string;
-        /**
-         * Type determines the format of the Subject Alternative Name. Always required.
-         *
-         * Support: Core
-         */
-        type: 'Hostname' | 'URI';
-        [k: string]: unknown;
-      }[];
-      /**
-       * WellKnownCACertificates specifies whether system CA certificates may be used in
-       * the TLS handshake between the gateway and backend pod.
-       *
-       * If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
-       * must be specified with at least one entry for a valid configuration. Only one of
-       * CACertificateRefs or WellKnownCACertificates may be specified, not both.
-       * If an implementation does not support the WellKnownCACertificates field, or
-       * the supplied value is not recognized, the implementation MUST ensure the
-       * `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
-       * a Reason `Invalid`.
-       *
-       * Support: Implementation-specific
-       */
-      wellKnownCACertificates?: 'System';
       /**
        * CACertificateRefs contains one or more references to Kubernetes objects that
        * contain a PEM-encoded TLS CA certificate bundle, which is used to
@@ -290,103 +336,57 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
        * Support: Core
        */
       hostname: string;
+      /**
+       * SubjectAltNames contains one or more Subject Alternative Names.
+       * When specified the certificate served from the backend MUST
+       * have at least one Subject Alternate Name matching one of the specified SubjectAltNames.
+       *
+       * Support: Extended
+       *
+       * @maxItems 5
+       */
+      subjectAltNames?: {
+        /**
+         * Hostname contains Subject Alternative Name specified in DNS name format.
+         * Required when Type is set to Hostname, ignored otherwise.
+         *
+         * Support: Core
+         */
+        hostname?: string;
+        /**
+         * Type determines the format of the Subject Alternative Name. Always required.
+         *
+         * Support: Core
+         */
+        type: 'Hostname' | 'URI';
+        /**
+         * URI contains Subject Alternative Name specified in a full URI format.
+         * It MUST include both a scheme (e.g., "http" or "ftp") and a scheme-specific-part.
+         * Common values include SPIFFE IDs like "spiffe://mycluster.example.com/ns/myns/sa/svc1sa".
+         * Required when Type is set to URI, ignored otherwise.
+         *
+         * Support: Core
+         */
+        uri?: string;
+        [k: string]: unknown;
+      }[];
+      /**
+       * WellKnownCACertificates specifies whether system CA certificates may be used in
+       * the TLS handshake between the gateway and backend pod.
+       *
+       * If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
+       * must be specified with at least one entry for a valid configuration. Only one of
+       * CACertificateRefs or WellKnownCACertificates may be specified, not both.
+       * If an implementation does not support the WellKnownCACertificates field, or
+       * the supplied value is not recognized, the implementation MUST ensure the
+       * `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
+       * a Reason `Invalid`.
+       *
+       * Support: Implementation-specific
+       */
+      wellKnownCACertificates?: 'System';
       [k: string]: unknown;
     };
-    /**
-     * Options are a list of key/value pairs to enable extended TLS
-     * configuration for each implementation. For example, configuring the
-     * minimum TLS version or supported cipher suites.
-     *
-     * A set of common keys MAY be defined by the API in the future. To avoid
-     * any ambiguity, implementation-specific definitions MUST use
-     * domain-prefixed names, such as `example.com/my-custom-option`.
-     * Un-prefixed names are reserved for key names defined by Gateway API.
-     *
-     * Support: Implementation-specific
-     */
-    options?: {
-      /**
-       * AnnotationValue is the value of an annotation in Gateway API. This is used
-       * for validation of maps such as TLS options. This roughly matches Kubernetes
-       * annotation validation, although the length validation in that case is based
-       * on the entire size of the annotations struct.
-       */
-      [k: string]: string;
-    };
-    /**
-     * TargetRefs identifies an API object to apply the policy to.
-     * Only Services have Extended support. Implementations MAY support
-     * additional objects, with Implementation Specific support.
-     * Note that this config applies to the entire referenced resource
-     * by default, but this default may change in the future to provide
-     * a more granular application of the policy.
-     *
-     * TargetRefs must be _distinct_. This means either that:
-     *
-     * * They select different targets. If this is the case, then targetRef
-     *   entries are distinct. In terms of fields, this means that the
-     *   multi-part key defined by `group`, `kind`, and `name` must
-     *   be unique across all targetRef entries in the BackendTLSPolicy.
-     * * They select different sectionNames in the same target.
-     *
-     * When more than one BackendTLSPolicy selects the same target and
-     * sectionName, implementations MUST determine precedence using the
-     * following criteria, continuing on ties:
-     *
-     * * The older policy by creation timestamp takes precedence. For
-     *   example, a policy with a creation timestamp of "2021-07-15
-     *   01:02:03" MUST be given precedence over a policy with a
-     *   creation timestamp of "2021-07-15 01:02:04".
-     * * The policy appearing first in alphabetical order by {name}.
-     *   For example, a policy named `bar` is given precedence over a
-     *   policy named `baz`.
-     *
-     * For any BackendTLSPolicy that does not take precedence, the
-     * implementation MUST ensure the `Accepted` Condition is set to
-     * `status: False`, with Reason `Conflicted`.
-     *
-     * Implementations SHOULD NOT support more than one targetRef at this
-     * time. Although the API technically allows for this, the current guidance
-     * for conflict resolution and status handling is lacking. Until that can be
-     * clarified in a future release, the safest approach is to support a single
-     * targetRef.
-     *
-     * Support: Extended for Kubernetes Service
-     *
-     * Support: Implementation-specific for any other resource
-     *
-     * @minItems 1
-     * @maxItems 16
-     */
-    targetRefs: {
-      /**
-       * SectionName is the name of a section within the target resource. When
-       * unspecified, this targetRef targets the entire resource. In the following
-       * resources, SectionName is interpreted as the following:
-       *
-       * * Gateway: Listener name
-       * * HTTPRoute: HTTPRouteRule name
-       * * Service: Port name
-       *
-       * If a SectionName is specified, but does not exist on the targeted object,
-       * the Policy must fail to attach, and the policy implementation should record
-       * a `ResolvedRefs` or similar Condition in the Policy's status.
-       */
-      sectionName?: string;
-      /**
-       * Group is the group of the target resource.
-       */
-      group: string;
-      /**
-       * Kind is kind of the target resource.
-       */
-      kind: string;
-      /**
-       * Name is the name of the target resource.
-       */
-      name: string;
-      [k: string]: unknown;
-    }[];
     [k: string]: unknown;
   };
   /**
@@ -535,6 +535,11 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
        */
       conditions: {
         /**
+         * lastTransitionTime is the last time the condition transitioned from one status to another.
+         * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+         */
+        lastTransitionTime: string;
+        /**
          * message is a human readable message indicating details about the transition.
          * This may be an empty string.
          */
@@ -561,11 +566,6 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
          * type of condition in CamelCase or in foo.example.com/CamelCase.
          */
         type: string;
-        /**
-         * lastTransitionTime is the last time the condition transitioned from one status to another.
-         * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
-         */
-        lastTransitionTime: string;
         [k: string]: unknown;
       }[];
       /**

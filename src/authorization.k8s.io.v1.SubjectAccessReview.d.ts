@@ -23,13 +23,47 @@ export interface AuthorizationK8SIoV1SubjectAccessReview {
       [k: string]: string;
     };
     /**
+     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+     */
+    creationTimestamp?: string;
+    /**
      * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
      */
     deletionGracePeriodSeconds?: number;
     /**
+     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+     */
+    deletionTimestamp?: string;
+    /**
+     * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
+     */
+    finalizers?: string[];
+    /**
+     * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
+     *
+     * If this field is specified and the generated name exists, the server will return a 409.
+     *
+     * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
+     */
+    generateName?: string;
+    /**
+     * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
+     */
+    generation?: number;
+    /**
+     * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+     */
+    labels?: {
+      [k: string]: string;
+    };
+    /**
      * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
      */
     managedFields?: {
+      /**
+       * APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted.
+       */
+      apiVersion?: string;
       /**
        * FieldsType is the discriminator for the different fields format and version. There is currently only one possible value: "FieldsV1"
        */
@@ -60,36 +94,22 @@ export interface AuthorizationK8SIoV1SubjectAccessReview {
        * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
        */
       time?: string;
-      /**
-       * APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted.
-       */
-      apiVersion?: string;
       [k: string]: unknown;
     }[];
-    /**
-     * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
-     */
-    selfLink?: string;
     /**
      * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
      */
     name?: string;
     /**
+     * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
+     *
+     * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
+     */
+    namespace?: string;
+    /**
      * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
      */
     ownerReferences?: {
-      /**
-       * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-       */
-      kind: string;
-      /**
-       * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
-       */
-      name: string;
-      /**
-       * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
-       */
-      uid: string;
       /**
        * API version of the referent.
        */
@@ -102,6 +122,18 @@ export interface AuthorizationK8SIoV1SubjectAccessReview {
        * If true, this reference points to the managing controller.
        */
       controller?: boolean;
+      /**
+       * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+       */
+      kind: string;
+      /**
+       * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+       */
+      name: string;
+      /**
+       * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+       */
+      uid: string;
       [k: string]: unknown;
     }[];
     /**
@@ -111,41 +143,9 @@ export interface AuthorizationK8SIoV1SubjectAccessReview {
      */
     resourceVersion?: string;
     /**
-     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+     * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
      */
-    creationTimestamp?: string;
-    /**
-     * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
-     */
-    finalizers?: string[];
-    /**
-     * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-     */
-    deletionTimestamp?: string;
-    /**
-     * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
-     *
-     * If this field is specified and the generated name exists, the server will return a 409.
-     *
-     * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
-     */
-    generateName?: string;
-    /**
-     * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
-     */
-    generation?: number;
-    /**
-     * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
-     */
-    labels?: {
-      [k: string]: string;
-    };
-    /**
-     * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
-     *
-     * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
-     */
-    namespace?: string;
+    selfLink?: string;
     /**
      * UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.
      *
@@ -158,6 +158,12 @@ export interface AuthorizationK8SIoV1SubjectAccessReview {
    * SubjectAccessReviewSpec is a description of the access request.  Exactly one of ResourceAuthorizationAttributes and NonResourceAuthorizationAttributes must be set
    */
   spec: {
+    /**
+     * Extra corresponds to the user.Info.GetExtra() method from the authenticator.  Since that is input to the authorizer it needs a reflection here.
+     */
+    extra?: {
+      [k: string]: string[];
+    };
     /**
      * Groups is the groups you're testing for.
      */
@@ -193,10 +199,6 @@ export interface AuthorizationK8SIoV1SubjectAccessReview {
          */
         requirements?: {
           /**
-           * values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty.
-           */
-          values?: string[];
-          /**
            * key is the field selector key that the requirement applies to.
            */
           key: string;
@@ -204,6 +206,10 @@ export interface AuthorizationK8SIoV1SubjectAccessReview {
            * operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. The list of operators may grow in the future.
            */
           operator: string;
+          /**
+           * values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty.
+           */
+          values?: string[];
           [k: string]: unknown;
         }[];
         [k: string]: unknown;
@@ -212,18 +218,6 @@ export interface AuthorizationK8SIoV1SubjectAccessReview {
        * Group is the API Group of the Resource.  "*" means all.
        */
       group?: string;
-      /**
-       * Subresource is one of the existing resource types.  "" means none.
-       */
-      subresource?: string;
-      /**
-       * Verb is a kubernetes resource API verb, like: get, list, watch, create, update, delete, proxy.  "*" means all.
-       */
-      verb?: string;
-      /**
-       * Version is the API Version of the Resource.  "*" means all.
-       */
-      version?: string;
       /**
        * LabelSelectorAttributes indicates a label limited access. Webhook authors are encouraged to * ensure rawSelector and requirements are not both set * consider the requirements field if set * not try to parse or consider the rawSelector field if set. This is to avoid another CVE-2022-2880 (i.e. getting different systems to agree on how exactly to parse a query is not something we want), see https://www.oxeye.io/resources/golang-parameter-smuggling-attack for more details. For the *SubjectAccessReview endpoints of the kube-apiserver: * If rawSelector is empty and requirements are empty, the request is not limited. * If rawSelector is present and requirements are empty, the rawSelector will be parsed and limited if the parsing succeeds. * If rawSelector is empty and requirements are present, the requirements should be honored * If rawSelector is present and requirements are present, the request is invalid.
        */
@@ -264,6 +258,18 @@ export interface AuthorizationK8SIoV1SubjectAccessReview {
        * Resource is one of the existing resource types.  "*" means all.
        */
       resource?: string;
+      /**
+       * Subresource is one of the existing resource types.  "" means none.
+       */
+      subresource?: string;
+      /**
+       * Verb is a kubernetes resource API verb, like: get, list, watch, create, update, delete, proxy.  "*" means all.
+       */
+      verb?: string;
+      /**
+       * Version is the API Version of the Resource.  "*" means all.
+       */
+      version?: string;
       [k: string]: unknown;
     };
     /**
@@ -274,12 +280,6 @@ export interface AuthorizationK8SIoV1SubjectAccessReview {
      * User is the user you're testing for. If you specify "User" but not "Groups", then is it interpreted as "What if User were not a member of any groups
      */
     user?: string;
-    /**
-     * Extra corresponds to the user.Info.GetExtra() method from the authenticator.  Since that is input to the authorizer it needs a reflection here.
-     */
-    extra?: {
-      [k: string]: string[];
-    };
     [k: string]: unknown;
   };
   /**
