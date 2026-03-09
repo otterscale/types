@@ -22,7 +22,7 @@
     "@bufbuild/protobuf": "^2.11.0",
     "@connectrpc/connect": "^2.1.1",
     "@connectrpc/connect-node": "^2.1.1",
-    "@otterscale/api": "^0.8.0",
+    "@otterscale/api": "^0.8.23",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.3.0",
     "js-yaml": "^4.1.1",
