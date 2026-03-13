@@ -1,10 +1,9 @@
-/** Generated from Remote JSON Schema for groupsnapshot.storage.k8s.io.v1beta1.VolumeGroupSnapshotContent */
+/** Generated from Remote JSON Schema for ceph.rook.io.v1.CephCOSIDriver */
 
 /**
- * VolumeGroupSnapshotContent represents the actual "on-disk" group snapshot object
- * in the underlying storage system
+ * CephCOSIDriver represents the CRD for the Ceph COSI Driver Deployment
  */
-export interface GroupsnapshotStorageK8SIoV1Beta1VolumeGroupSnapshotContent {
+export interface CephRookIoV1CephCOSIDriver {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -16,7 +15,7 @@ export interface GroupsnapshotStorageK8SIoV1Beta1VolumeGroupSnapshotContent {
   /**
    * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
    */
-  metadata?: {
+  metadata: {
     /**
      * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
      */
@@ -156,207 +155,278 @@ export interface GroupsnapshotStorageK8SIoV1Beta1VolumeGroupSnapshotContent {
     [k: string]: unknown;
   };
   /**
-   * Spec defines properties of a VolumeGroupSnapshotContent created by the underlying storage system.
-   * Required.
+   * Spec represents the specification of a Ceph COSI Driver
    */
   spec: {
     /**
-     * DeletionPolicy determines whether this VolumeGroupSnapshotContent and the
-     * physical group snapshot on the underlying storage system should be deleted
-     * when the bound VolumeGroupSnapshot is deleted.
-     * Supported values are "Retain" and "Delete".
-     * "Retain" means that the VolumeGroupSnapshotContent and its physical group
-     * snapshot on underlying storage system are kept.
-     * "Delete" means that the VolumeGroupSnapshotContent and its physical group
-     * snapshot on underlying storage system are deleted.
-     * For dynamically provisioned group snapshots, this field will automatically
-     * be filled in by the CSI snapshotter sidecar with the "DeletionPolicy" field
-     * defined in the corresponding VolumeGroupSnapshotClass.
-     * For pre-existing snapshots, users MUST specify this field when creating the
-     * VolumeGroupSnapshotContent object.
-     * Required.
+     * DeploymentStrategy is the strategy to use to deploy the COSI driver.
      */
-    deletionPolicy: 'Delete' | 'Retain';
+    deploymentStrategy?: 'Never' | 'Auto' | 'Always';
     /**
-     * Driver is the name of the CSI driver used to create the physical group snapshot on
-     * the underlying storage system.
-     * This MUST be the same as the name returned by the CSI GetPluginName() call for
-     * that driver.
-     * Required.
+     * Image is the container image to run the Ceph COSI driver
      */
-    driver: string;
+    image?: string;
     /**
-     * Source specifies whether the snapshot is (or should be) dynamically provisioned
-     * or already exists, and just requires a Kubernetes object representation.
-     * This field is immutable after creation.
-     * Required.
+     * ObjectProvisionerImage is the container image to run the COSI driver sidecar
      */
-    source: {
-      /**
-       * GroupSnapshotHandles specifies the CSI "group_snapshot_id" of a pre-existing
-       * group snapshot and a list of CSI "snapshot_id" of pre-existing snapshots
-       * on the underlying storage system for which a Kubernetes object
-       * representation was (or should be) created.
-       * This field is immutable.
-       */
-      groupSnapshotHandles?: {
-        /**
-         * VolumeGroupSnapshotHandle specifies the CSI "group_snapshot_id" of a pre-existing
-         * group snapshot on the underlying storage system for which a Kubernetes object
-         * representation was (or should be) created.
-         * This field is immutable.
-         * Required.
-         */
-        volumeGroupSnapshotHandle: string;
-        /**
-         * VolumeSnapshotHandles is a list of CSI "snapshot_id" of pre-existing
-         * snapshots on the underlying storage system for which Kubernetes objects
-         * representation were (or should be) created.
-         * This field is immutable.
-         * Required.
-         */
-        volumeSnapshotHandles: string[];
+    objectProvisionerImage?: string;
+    placement?: {
+      nodeAffinity?: {
+        preferredDuringSchedulingIgnoredDuringExecution?: {
+          preference: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchFields?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            [k: string]: unknown;
+          };
+          weight: number;
+          [k: string]: unknown;
+        }[];
+        requiredDuringSchedulingIgnoredDuringExecution?: {
+          nodeSelectorTerms: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchFields?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            [k: string]: unknown;
+          }[];
+          [k: string]: unknown;
+        };
         [k: string]: unknown;
       };
-      /**
-       * VolumeHandles is a list of volume handles on the backend to be snapshotted
-       * together. It is specified for dynamic provisioning of the VolumeGroupSnapshot.
-       * This field is immutable.
-       */
-      volumeHandles?: string[];
+      podAffinity?: {
+        preferredDuringSchedulingIgnoredDuringExecution?: {
+          podAffinityTerm: {
+            labelSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            matchLabelKeys?: string[];
+            mismatchLabelKeys?: string[];
+            namespaceSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            namespaces?: string[];
+            topologyKey: string;
+            [k: string]: unknown;
+          };
+          weight: number;
+          [k: string]: unknown;
+        }[];
+        requiredDuringSchedulingIgnoredDuringExecution?: {
+          labelSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          matchLabelKeys?: string[];
+          mismatchLabelKeys?: string[];
+          namespaceSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          namespaces?: string[];
+          topologyKey: string;
+          [k: string]: unknown;
+        }[];
+        [k: string]: unknown;
+      };
+      podAntiAffinity?: {
+        preferredDuringSchedulingIgnoredDuringExecution?: {
+          podAffinityTerm: {
+            labelSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            matchLabelKeys?: string[];
+            mismatchLabelKeys?: string[];
+            namespaceSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            namespaces?: string[];
+            topologyKey: string;
+            [k: string]: unknown;
+          };
+          weight: number;
+          [k: string]: unknown;
+        }[];
+        requiredDuringSchedulingIgnoredDuringExecution?: {
+          labelSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          matchLabelKeys?: string[];
+          mismatchLabelKeys?: string[];
+          namespaceSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          namespaces?: string[];
+          topologyKey: string;
+          [k: string]: unknown;
+        }[];
+        [k: string]: unknown;
+      };
+      tolerations?: {
+        effect?: string;
+        key?: string;
+        operator?: string;
+        tolerationSeconds?: number;
+        value?: string;
+        [k: string]: unknown;
+      }[];
+      topologySpreadConstraints?: {
+        labelSelector?: {
+          matchExpressions?: {
+            key: string;
+            operator: string;
+            values?: string[];
+            [k: string]: unknown;
+          }[];
+          matchLabels?: {
+            [k: string]: string;
+          };
+          [k: string]: unknown;
+        };
+        matchLabelKeys?: string[];
+        maxSkew: number;
+        minDomains?: number;
+        nodeAffinityPolicy?: string;
+        nodeTaintsPolicy?: string;
+        topologyKey: string;
+        whenUnsatisfiable: string;
+        [k: string]: unknown;
+      }[];
       [k: string]: unknown;
     };
     /**
-     * VolumeGroupSnapshotClassName is the name of the VolumeGroupSnapshotClass from
-     * which this group snapshot was (or will be) created.
-     * Note that after provisioning, the VolumeGroupSnapshotClass may be deleted or
-     * recreated with different set of values, and as such, should not be referenced
-     * post-snapshot creation.
-     * For dynamic provisioning, this field must be set.
-     * This field may be unset for pre-provisioned snapshots.
+     * Resources is the resource requirements for the COSI driver
      */
-    volumeGroupSnapshotClassName?: string;
-    /**
-     * VolumeGroupSnapshotRef specifies the VolumeGroupSnapshot object to which this
-     * VolumeGroupSnapshotContent object is bound.
-     * VolumeGroupSnapshot.Spec.VolumeGroupSnapshotContentName field must reference to
-     * this VolumeGroupSnapshotContent's name for the bidirectional binding to be valid.
-     * For a pre-existing VolumeGroupSnapshotContent object, name and namespace of the
-     * VolumeGroupSnapshot object MUST be provided for binding to happen.
-     * This field is immutable after creation.
-     * Required.
-     */
-    volumeGroupSnapshotRef: {
+    resources?: {
       /**
-       * API version of the referent.
+       * Claims lists the names of resources, defined in spec.resourceClaims,
+       * that are used by this container.
+       *
+       * This field depends on the
+       * DynamicResourceAllocation feature gate.
+       *
+       * This field is immutable. It can only be set for containers.
        */
-      apiVersion?: string;
+      claims?: {
+        /**
+         * Name must match the name of one entry in pod.spec.resourceClaims of
+         * the Pod where this field is used. It makes that resource available
+         * inside a container.
+         */
+        name: string;
+        /**
+         * Request is the name chosen for a request in the referenced claim.
+         * If empty, everything from the claim is made available, otherwise
+         * only the result of this request.
+         */
+        request?: string;
+        [k: string]: unknown;
+      }[];
       /**
-       * If referring to a piece of an object instead of an entire object, this string
-       * should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
-       * For example, if the object reference is to a container within a pod, this would take on a value like:
-       * "spec.containers{name}" (where "name" refers to the name of the container that triggered
-       * the event) or if no container name is specified "spec.containers[2]" (container with
-       * index 2 in this pod). This syntax is chosen only to have some well-defined way of
-       * referencing a part of an object.
-       * TODO: this design is not final and this field is subject to change in the future.
+       * Limits describes the maximum amount of compute resources allowed.
+       * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
        */
-      fieldPath?: string;
+      limits?: {
+        [k: string]: number | string;
+      };
       /**
-       * Kind of the referent.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+       * Requests describes the minimum amount of compute resources required.
+       * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+       * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+       * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
        */
-      kind?: string;
-      /**
-       * Name of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-       */
-      name?: string;
-      /**
-       * Namespace of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
-       */
-      namespace?: string;
-      /**
-       * Specific resourceVersion to which this reference is made, if any.
-       * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
-       */
-      resourceVersion?: string;
-      /**
-       * UID of the referent.
-       * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
-       */
-      uid?: string;
+      requests?: {
+        [k: string]: number | string;
+      };
       [k: string]: unknown;
     };
-    [k: string]: unknown;
-  };
-  /**
-   * status represents the current information of a group snapshot.
-   */
-  status?: {
-    /**
-     * CreationTime is the timestamp when the point-in-time group snapshot is taken
-     * by the underlying storage system.
-     * If not specified, it indicates the creation time is unknown.
-     * If not specified, it means the readiness of a group snapshot is unknown.
-     * The format of this field is a Unix nanoseconds time encoded as an int64.
-     * On Unix, the command date +%s%N returns the current time in nanoseconds
-     * since 1970-01-01 00:00:00 UTC.
-     * This field is the source for the CreationTime field in VolumeGroupSnapshotStatus
-     */
-    creationTime?: string;
-    /**
-     * Error is the last observed error during group snapshot creation, if any.
-     * Upon success after retry, this error field will be cleared.
-     */
-    error?: {
-      /**
-       * message is a string detailing the encountered error during snapshot
-       * creation if specified.
-       * NOTE: message may be logged, and it should not contain sensitive
-       * information.
-       */
-      message?: string;
-      /**
-       * time is the timestamp when the error was encountered.
-       */
-      time?: string;
-      [k: string]: unknown;
-    };
-    /**
-     * ReadyToUse indicates if all the individual snapshots in the group are ready to be
-     * used to restore a group of volumes.
-     * ReadyToUse becomes true when ReadyToUse of all individual snapshots become true.
-     */
-    readyToUse?: boolean;
-    /**
-     * VolumeGroupSnapshotHandle is a unique id returned by the CSI driver
-     * to identify the VolumeGroupSnapshot on the storage system.
-     * If a storage system does not provide such an id, the
-     * CSI driver can choose to return the VolumeGroupSnapshot name.
-     */
-    volumeGroupSnapshotHandle?: string;
-    /**
-     * VolumeSnapshotHandlePairList is a list of CSI "volume_id" and "snapshot_id"
-     * pair returned by the CSI driver to identify snapshots and their source volumes
-     * on the storage system.
-     */
-    volumeSnapshotHandlePairList?: {
-      /**
-       * SnapshotHandle is a unique id returned by the CSI driver to identify a volume
-       * snapshot on the storage system
-       * Required.
-       */
-      snapshotHandle: string;
-      /**
-       * VolumeHandle is a unique id returned by the CSI driver to identify a volume
-       * on the storage system
-       * Required.
-       */
-      volumeHandle: string;
-      [k: string]: unknown;
-    }[];
     [k: string]: unknown;
   };
   [k: string]: unknown;

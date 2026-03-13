@@ -163,7 +163,7 @@ export interface BatchV1Job {
      */
     activeDeadlineSeconds?: number;
     /**
-     * Specifies the number of retries before marking this job failed. Defaults to 6
+     * Specifies the number of retries before marking this job failed. Defaults to 6, unless backoffLimitPerIndex (only Indexed Job) is specified. When backoffLimitPerIndex is specified, backoffLimit defaults to 2147483647.
      */
     backoffLimit?: number;
     /**
@@ -190,8 +190,6 @@ export interface BatchV1Job {
     completions?: number;
     /**
      * ManagedBy field indicates the controller that manages a Job. The k8s Job controller reconciles jobs which don't have this field at all or the field value is the reserved string `kubernetes.io/job-controller`, but skips reconciling Jobs with a custom value for this field. The value must be a valid domain-prefixed path (e.g. acme.io/foo) - all characters before the first "/" must be a valid subdomain as defined by RFC 1123. All characters trailing the first "/" must be valid HTTP Path characters as defined by RFC 3986. The value cannot exceed 63 characters. This field is immutable.
-     *
-     * This field is beta-level. The job controller accepts setting the field when the feature gate JobManagedBy is enabled (enabled by default).
      */
     managedBy?: string;
     /**
@@ -271,7 +269,7 @@ export interface BatchV1Job {
           /**
            * Specifies the required Pod condition status. To match a pod condition it is required that the specified status equals the pod condition status. Defaults to True.
            */
-          status: string;
+          status?: string;
           /**
            * Specifies the required Pod condition type. To match a pod condition it is required that specified type equals the pod condition type.
            */
@@ -288,7 +286,7 @@ export interface BatchV1Job {
      * - Failed means to wait until a previously created Pod is fully terminated (has phase
      *   Failed or Succeeded) before creating a replacement Pod.
      *
-     * When using podFailurePolicy, Failed is the the only allowed value. TerminatingOrFailed and Failed are allowed values when podFailurePolicy is not in use. This is an beta field. To use this, enable the JobPodReplacementPolicy feature toggle. This is on by default.
+     * When using podFailurePolicy, Failed is the the only allowed value. TerminatingOrFailed and Failed are allowed values when podFailurePolicy is not in use.
      *
      * Possible enum values:
      *  - `"Failed"` means to wait until a previously created Pod is fully terminated (has phase Failed or Succeeded) before creating a replacement Pod.
@@ -330,7 +328,7 @@ export interface BatchV1Job {
      */
     successPolicy?: {
       /**
-       * rules represents the list of alternative rules for the declaring the Jobs as successful before `.status.succeeded >= .spec.completions`. Once any of the rules are met, the "SucceededCriteriaMet" condition is added, and the lingering pods are removed. The terminal state for such a Job has the "Complete" condition. Additionally, these rules are evaluated in order; Once the Job meets one of the rules, other rules are ignored. At most 20 elements are allowed.
+       * rules represents the list of alternative rules for the declaring the Jobs as successful before `.status.succeeded >= .spec.completions`. Once any of the rules are met, the "SuccessCriteriaMet" condition is added, and the lingering pods are removed. The terminal state for such a Job has the "Complete" condition. Additionally, these rules are evaluated in order; Once the Job meets one of the rules, other rules are ignored. At most 20 elements are allowed.
        */
       rules: {
         /**
@@ -830,7 +828,7 @@ export interface BatchV1Job {
            */
           podAntiAffinity?: {
             /**
-             * The scheduler will prefer to schedule pods to nodes that satisfy the anti-affinity expressions specified by this field, but it may choose a node that violates one or more of the expressions. The node that is most preferred is the one with the greatest sum of weights, i.e. for each node that meets all of the scheduling requirements (resource request, requiredDuringScheduling anti-affinity expressions, etc.), compute a sum by iterating through the elements of this field and adding "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the node(s) with the highest sum are the most preferred.
+             * The scheduler will prefer to schedule pods to nodes that satisfy the anti-affinity expressions specified by this field, but it may choose a node that violates one or more of the expressions. The node that is most preferred is the one with the greatest sum of weights, i.e. for each node that meets all of the scheduling requirements (resource request, requiredDuringScheduling anti-affinity expressions, etc.), compute a sum by iterating through the elements of this field and subtracting "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the node(s) with the highest sum are the most preferred.
              */
             preferredDuringSchedulingIgnoredDuringExecution?: {
               /**
@@ -1028,7 +1026,7 @@ export interface BatchV1Job {
            */
           env?: {
             /**
-             * Name of the environment variable. Must be a C_IDENTIFIER.
+             * Name of the environment variable. May consist of any printable ASCII characters except '='.
              */
             name: string;
             /**
@@ -1069,6 +1067,30 @@ export interface BatchV1Job {
                  * Path of the field to select in the specified API version.
                  */
                 fieldPath: string;
+                [k: string]: unknown;
+              };
+              /**
+               * FileKeySelector selects a key of the env file.
+               */
+              fileKeyRef?: {
+                /**
+                 * The key within the env file. An invalid key will prevent the pod from starting. The keys defined within a source may consist of any printable ASCII characters except '='. During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+                 */
+                key: string;
+                /**
+                 * Specify whether the file or its key must be defined. If the file or key does not exist, then the env var is not published. If optional is set to true and the specified key does not exist, the environment variable will not be set in the Pod's containers.
+                 *
+                 * If optional is set to false and the specified key does not exist, an error will be returned during Pod creation.
+                 */
+                optional?: boolean;
+                /**
+                 * The path within the volume from which to select the file. Must be relative and may not contain the '..' path or start with '..'.
+                 */
+                path: string;
+                /**
+                 * The name of the volume mount containing the env file.
+                 */
+                volumeName: string;
                 [k: string]: unknown;
               };
               /**
@@ -1148,7 +1170,7 @@ export interface BatchV1Job {
             [k: string]: unknown;
           }[];
           /**
-           * List of sources to populate environment variables in the container. The keys defined within a source must be a C_IDENTIFIER. All invalid keys will be reported as an event when the container is starting. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated.
+           * List of sources to populate environment variables in the container. The keys defined within a source may consist of any printable ASCII characters except '='. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated.
            */
           envFrom?: {
             /**
@@ -1168,7 +1190,7 @@ export interface BatchV1Job {
               [k: string]: unknown;
             };
             /**
-             * Optional text to prepend to the name of each environment variable. Must be a C_IDENTIFIER.
+             * Optional text to prepend to the name of each environment variable. May consist of any printable ASCII characters except '='.
              */
             prefix?: string;
             /**
@@ -1760,7 +1782,7 @@ export interface BatchV1Job {
             [k: string]: unknown;
           };
           /**
-           * Resources resize policy for the container.
+           * Resources resize policy for the container. This field cannot be set on ephemeral containers.
            */
           resizePolicy?: {
             /**
@@ -1780,7 +1802,7 @@ export interface BatchV1Job {
             /**
              * Claims lists the names of resources, defined in spec.resourceClaims, that are used by this container.
              *
-             * This is an alpha field and requires enabling the DynamicResourceAllocation feature gate.
+             * This field depends on the DynamicResourceAllocation feature gate.
              *
              * This field is immutable. It can only be set for containers.
              */
@@ -1888,9 +1910,36 @@ export interface BatchV1Job {
             [k: string]: unknown;
           };
           /**
-           * RestartPolicy defines the restart behavior of individual containers in a pod. This field may only be set for init containers, and the only allowed value is "Always". For non-init containers or when this field is not specified, the restart behavior is defined by the Pod's restart policy and the container type. Setting the RestartPolicy as "Always" for the init container will have the following effect: this init container will be continually restarted on exit until all regular containers have terminated. Once all regular containers have completed, all init containers with restartPolicy "Always" will be shut down. This lifecycle differs from normal init containers and is often referred to as a "sidecar" container. Although this init container still starts in the init container sequence, it does not wait for the container to complete before proceeding to the next init container. Instead, the next init container starts immediately after this init container is started, or after any startupProbe has successfully completed.
+           * RestartPolicy defines the restart behavior of individual containers in a pod. This overrides the pod-level restart policy. When this field is not specified, the restart behavior is defined by the Pod's restart policy and the container type. Additionally, setting the RestartPolicy as "Always" for the init container will have the following effect: this init container will be continually restarted on exit until all regular containers have terminated. Once all regular containers have completed, all init containers with restartPolicy "Always" will be shut down. This lifecycle differs from normal init containers and is often referred to as a "sidecar" container. Although this init container still starts in the init container sequence, it does not wait for the container to complete before proceeding to the next init container. Instead, the next init container starts immediately after this init container is started, or after any startupProbe has successfully completed.
            */
           restartPolicy?: string;
+          /**
+           * Represents a list of rules to be checked to determine if the container should be restarted on exit. The rules are evaluated in order. Once a rule matches a container exit condition, the remaining rules are ignored. If no rule matches the container exit condition, the Container-level restart policy determines the whether the container is restarted or not. Constraints on the rules: - At most 20 rules are allowed. - Rules can have the same action. - Identical rules are not forbidden in validations. When rules are specified, container MUST set RestartPolicy explicitly even it if matches the Pod's RestartPolicy.
+           */
+          restartPolicyRules?: {
+            /**
+             * Specifies the action taken on a container exit if the requirements are satisfied. The only possible value is "Restart" to restart the container.
+             */
+            action: string;
+            /**
+             * ContainerRestartRuleOnExitCodes describes the condition for handling an exited container based on its exit codes.
+             */
+            exitCodes?: {
+              /**
+               * Represents the relationship between the container exit code(s) and the specified values. Possible values are: - In: the requirement is satisfied if the container exit code is in the
+               *   set of specified values.
+               * - NotIn: the requirement is satisfied if the container exit code is
+               *   not in the set of specified values.
+               */
+              operator: string;
+              /**
+               * Specifies the set of values to check for container exit codes. At most 255 elements are allowed.
+               */
+              values?: number[];
+              [k: string]: unknown;
+            };
+            [k: string]: unknown;
+          }[];
           /**
            * SecurityContext holds security configuration that will be applied to a container. Some fields are present in both SecurityContext and PodSecurityContext.  When both are set, the values in SecurityContext take precedence.
            */
@@ -2290,7 +2339,7 @@ export interface BatchV1Job {
            */
           env?: {
             /**
-             * Name of the environment variable. Must be a C_IDENTIFIER.
+             * Name of the environment variable. May consist of any printable ASCII characters except '='.
              */
             name: string;
             /**
@@ -2331,6 +2380,30 @@ export interface BatchV1Job {
                  * Path of the field to select in the specified API version.
                  */
                 fieldPath: string;
+                [k: string]: unknown;
+              };
+              /**
+               * FileKeySelector selects a key of the env file.
+               */
+              fileKeyRef?: {
+                /**
+                 * The key within the env file. An invalid key will prevent the pod from starting. The keys defined within a source may consist of any printable ASCII characters except '='. During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+                 */
+                key: string;
+                /**
+                 * Specify whether the file or its key must be defined. If the file or key does not exist, then the env var is not published. If optional is set to true and the specified key does not exist, the environment variable will not be set in the Pod's containers.
+                 *
+                 * If optional is set to false and the specified key does not exist, an error will be returned during Pod creation.
+                 */
+                optional?: boolean;
+                /**
+                 * The path within the volume from which to select the file. Must be relative and may not contain the '..' path or start with '..'.
+                 */
+                path: string;
+                /**
+                 * The name of the volume mount containing the env file.
+                 */
+                volumeName: string;
                 [k: string]: unknown;
               };
               /**
@@ -2410,7 +2483,7 @@ export interface BatchV1Job {
             [k: string]: unknown;
           }[];
           /**
-           * List of sources to populate environment variables in the container. The keys defined within a source must be a C_IDENTIFIER. All invalid keys will be reported as an event when the container is starting. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated.
+           * List of sources to populate environment variables in the container. The keys defined within a source may consist of any printable ASCII characters except '='. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated.
            */
           envFrom?: {
             /**
@@ -2430,7 +2503,7 @@ export interface BatchV1Job {
               [k: string]: unknown;
             };
             /**
-             * Optional text to prepend to the name of each environment variable. Must be a C_IDENTIFIER.
+             * Optional text to prepend to the name of each environment variable. May consist of any printable ASCII characters except '='.
              */
             prefix?: string;
             /**
@@ -3042,7 +3115,7 @@ export interface BatchV1Job {
             /**
              * Claims lists the names of resources, defined in spec.resourceClaims, that are used by this container.
              *
-             * This is an alpha field and requires enabling the DynamicResourceAllocation feature gate.
+             * This field depends on the DynamicResourceAllocation feature gate.
              *
              * This field is immutable. It can only be set for containers.
              */
@@ -3150,9 +3223,36 @@ export interface BatchV1Job {
             [k: string]: unknown;
           };
           /**
-           * Restart policy for the container to manage the restart behavior of each container within a pod. This may only be set for init containers. You cannot set this field on ephemeral containers.
+           * Restart policy for the container to manage the restart behavior of each container within a pod. You cannot set this field on ephemeral containers.
            */
           restartPolicy?: string;
+          /**
+           * Represents a list of rules to be checked to determine if the container should be restarted on exit. You cannot set this field on ephemeral containers.
+           */
+          restartPolicyRules?: {
+            /**
+             * Specifies the action taken on a container exit if the requirements are satisfied. The only possible value is "Restart" to restart the container.
+             */
+            action: string;
+            /**
+             * ContainerRestartRuleOnExitCodes describes the condition for handling an exited container based on its exit codes.
+             */
+            exitCodes?: {
+              /**
+               * Represents the relationship between the container exit code(s) and the specified values. Possible values are: - In: the requirement is satisfied if the container exit code is in the
+               *   set of specified values.
+               * - NotIn: the requirement is satisfied if the container exit code is
+               *   not in the set of specified values.
+               */
+              operator: string;
+              /**
+               * Specifies the set of values to check for container exit codes. At most 255 elements are allowed.
+               */
+              values?: number[];
+              [k: string]: unknown;
+            };
+            [k: string]: unknown;
+          }[];
           /**
            * SecurityContext holds security configuration that will be applied to a container. Some fields are present in both SecurityContext and PodSecurityContext.  When both are set, the values in SecurityContext take precedence.
            */
@@ -3518,7 +3618,7 @@ export interface BatchV1Job {
          */
         hostIPC?: boolean;
         /**
-         * Host networking requested for this pod. Use the host's network namespace. If this option is set, the ports that will be used must be specified. Default to false.
+         * Host networking requested for this pod. Use the host's network namespace. When using HostNetwork you should specify ports so the scheduler is aware. When `hostNetwork` is true, specified `hostPort` fields in port definitions must match `containerPort`, and unspecified `hostPort` fields in port definitions are defaulted to match `containerPort`. Default to false.
          */
         hostNetwork?: boolean;
         /**
@@ -3533,6 +3633,12 @@ export interface BatchV1Job {
          * Specifies the hostname of the Pod If not specified, the pod's hostname will be set to a system-defined value.
          */
         hostname?: string;
+        /**
+         * HostnameOverride specifies an explicit override for the pod's hostname as perceived by the pod. This field only specifies the pod's hostname and does not affect its DNS records. When this field is set to a non-empty string: - It takes precedence over the values set in `hostname` and `subdomain`. - The Pod's hostname will be set to this value. - `setHostnameAsFQDN` must be nil or set to false. - `hostNetwork` must be set to false.
+         *
+         * This field must be a valid DNS subdomain as defined in RFC 1123 and contain at most 64 characters. Requires the HostnameOverride feature gate to be enabled.
+         */
+        hostnameOverride?: string;
         /**
          * ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec. If specified, these secrets will be passed to individual puller implementations for them to use. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
          */
@@ -3560,7 +3666,7 @@ export interface BatchV1Job {
            */
           env?: {
             /**
-             * Name of the environment variable. Must be a C_IDENTIFIER.
+             * Name of the environment variable. May consist of any printable ASCII characters except '='.
              */
             name: string;
             /**
@@ -3601,6 +3707,30 @@ export interface BatchV1Job {
                  * Path of the field to select in the specified API version.
                  */
                 fieldPath: string;
+                [k: string]: unknown;
+              };
+              /**
+               * FileKeySelector selects a key of the env file.
+               */
+              fileKeyRef?: {
+                /**
+                 * The key within the env file. An invalid key will prevent the pod from starting. The keys defined within a source may consist of any printable ASCII characters except '='. During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+                 */
+                key: string;
+                /**
+                 * Specify whether the file or its key must be defined. If the file or key does not exist, then the env var is not published. If optional is set to true and the specified key does not exist, the environment variable will not be set in the Pod's containers.
+                 *
+                 * If optional is set to false and the specified key does not exist, an error will be returned during Pod creation.
+                 */
+                optional?: boolean;
+                /**
+                 * The path within the volume from which to select the file. Must be relative and may not contain the '..' path or start with '..'.
+                 */
+                path: string;
+                /**
+                 * The name of the volume mount containing the env file.
+                 */
+                volumeName: string;
                 [k: string]: unknown;
               };
               /**
@@ -3680,7 +3810,7 @@ export interface BatchV1Job {
             [k: string]: unknown;
           }[];
           /**
-           * List of sources to populate environment variables in the container. The keys defined within a source must be a C_IDENTIFIER. All invalid keys will be reported as an event when the container is starting. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated.
+           * List of sources to populate environment variables in the container. The keys defined within a source may consist of any printable ASCII characters except '='. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated.
            */
           envFrom?: {
             /**
@@ -3700,7 +3830,7 @@ export interface BatchV1Job {
               [k: string]: unknown;
             };
             /**
-             * Optional text to prepend to the name of each environment variable. Must be a C_IDENTIFIER.
+             * Optional text to prepend to the name of each environment variable. May consist of any printable ASCII characters except '='.
              */
             prefix?: string;
             /**
@@ -4292,7 +4422,7 @@ export interface BatchV1Job {
             [k: string]: unknown;
           };
           /**
-           * Resources resize policy for the container.
+           * Resources resize policy for the container. This field cannot be set on ephemeral containers.
            */
           resizePolicy?: {
             /**
@@ -4312,7 +4442,7 @@ export interface BatchV1Job {
             /**
              * Claims lists the names of resources, defined in spec.resourceClaims, that are used by this container.
              *
-             * This is an alpha field and requires enabling the DynamicResourceAllocation feature gate.
+             * This field depends on the DynamicResourceAllocation feature gate.
              *
              * This field is immutable. It can only be set for containers.
              */
@@ -4420,9 +4550,36 @@ export interface BatchV1Job {
             [k: string]: unknown;
           };
           /**
-           * RestartPolicy defines the restart behavior of individual containers in a pod. This field may only be set for init containers, and the only allowed value is "Always". For non-init containers or when this field is not specified, the restart behavior is defined by the Pod's restart policy and the container type. Setting the RestartPolicy as "Always" for the init container will have the following effect: this init container will be continually restarted on exit until all regular containers have terminated. Once all regular containers have completed, all init containers with restartPolicy "Always" will be shut down. This lifecycle differs from normal init containers and is often referred to as a "sidecar" container. Although this init container still starts in the init container sequence, it does not wait for the container to complete before proceeding to the next init container. Instead, the next init container starts immediately after this init container is started, or after any startupProbe has successfully completed.
+           * RestartPolicy defines the restart behavior of individual containers in a pod. This overrides the pod-level restart policy. When this field is not specified, the restart behavior is defined by the Pod's restart policy and the container type. Additionally, setting the RestartPolicy as "Always" for the init container will have the following effect: this init container will be continually restarted on exit until all regular containers have terminated. Once all regular containers have completed, all init containers with restartPolicy "Always" will be shut down. This lifecycle differs from normal init containers and is often referred to as a "sidecar" container. Although this init container still starts in the init container sequence, it does not wait for the container to complete before proceeding to the next init container. Instead, the next init container starts immediately after this init container is started, or after any startupProbe has successfully completed.
            */
           restartPolicy?: string;
+          /**
+           * Represents a list of rules to be checked to determine if the container should be restarted on exit. The rules are evaluated in order. Once a rule matches a container exit condition, the remaining rules are ignored. If no rule matches the container exit condition, the Container-level restart policy determines the whether the container is restarted or not. Constraints on the rules: - At most 20 rules are allowed. - Rules can have the same action. - Identical rules are not forbidden in validations. When rules are specified, container MUST set RestartPolicy explicitly even it if matches the Pod's RestartPolicy.
+           */
+          restartPolicyRules?: {
+            /**
+             * Specifies the action taken on a container exit if the requirements are satisfied. The only possible value is "Restart" to restart the container.
+             */
+            action: string;
+            /**
+             * ContainerRestartRuleOnExitCodes describes the condition for handling an exited container based on its exit codes.
+             */
+            exitCodes?: {
+              /**
+               * Represents the relationship between the container exit code(s) and the specified values. Possible values are: - In: the requirement is satisfied if the container exit code is in the
+               *   set of specified values.
+               * - NotIn: the requirement is satisfied if the container exit code is
+               *   not in the set of specified values.
+               */
+              operator: string;
+              /**
+               * Specifies the set of values to check for container exit codes. At most 255 elements are allowed.
+               */
+              values?: number[];
+              [k: string]: unknown;
+            };
+            [k: string]: unknown;
+          }[];
           /**
            * SecurityContext holds security configuration that will be applied to a container. Some fields are present in both SecurityContext and PodSecurityContext.  When both are set, the values in SecurityContext take precedence.
            */
@@ -4857,7 +5014,7 @@ export interface BatchV1Job {
         /**
          * ResourceClaims defines which ResourceClaims must be allocated and reserved before the Pod is allowed to start. The resources will be made available to those containers which consume them by name.
          *
-         * This is an alpha field and requires enabling the DynamicResourceAllocation feature gate.
+         * This is a stable field but requires that the DynamicResourceAllocation feature gate is enabled.
          *
          * This field is immutable.
          */
@@ -4891,7 +5048,7 @@ export interface BatchV1Job {
           /**
            * Claims lists the names of resources, defined in spec.resourceClaims, that are used by this container.
            *
-           * This is an alpha field and requires enabling the DynamicResourceAllocation feature gate.
+           * This field depends on the DynamicResourceAllocation feature gate.
            *
            * This field is immutable. It can only be set for containers.
            */
@@ -5230,13 +5387,15 @@ export interface BatchV1Job {
            */
           key?: string;
           /**
-           * Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category.
+           * Operator represents a key's relationship to the value. Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category. Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
            *
            * Possible enum values:
            *  - `"Equal"`
            *  - `"Exists"`
+           *  - `"Gt"`
+           *  - `"Lt"`
            */
-          operator?: 'Equal' | 'Exists';
+          operator?: 'Equal' | 'Exists' | 'Gt' | 'Lt';
           /**
            * TolerationSeconds represents the period of time the toleration (which must be of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default, it is not set, which means tolerate the taint forever (do not evict). Zero and negative values will be treated as 0 (evict immediately) by the system.
            */
@@ -6027,7 +6186,7 @@ export interface BatchV1Job {
                  */
                 storageClassName?: string;
                 /**
-                 * volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim. If specified, the CSI driver will create or update the volume with the attributes defined in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName, it can be changed after the claim is created. An empty string value means that no VolumeAttributesClass will be applied to the claim but it's not allowed to reset this field to empty string once it is set. If unspecified and the PersistentVolumeClaim is unbound, the default VolumeAttributesClass will be set by the persistentvolume controller if it exists. If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource exists. More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/ (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
+                 * volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim. If specified, the CSI driver will create or update the volume with the attributes defined in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName, it can be changed after the claim is created. An empty string or nil value indicates that no VolumeAttributesClass will be applied to the claim. If the claim enters an Infeasible error state, this field can be reset to its previous value (including nil) to cancel the modification. If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource exists. More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
                  */
                 volumeAttributesClassName?: string;
                 /**
@@ -6171,7 +6330,7 @@ export interface BatchV1Job {
            */
           glusterfs?: {
             /**
-             * endpoints is the endpoint name that details Glusterfs topology. More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
+             * endpoints is the endpoint name that details Glusterfs topology.
              */
             endpoints: string;
             /**
@@ -6546,6 +6705,66 @@ export interface BatchV1Job {
                 [k: string]: unknown;
               };
               /**
+               * PodCertificateProjection provides a private key and X.509 certificate in the pod filesystem.
+               */
+              podCertificate?: {
+                /**
+                 * Write the certificate chain at this path in the projected volume.
+                 *
+                 * Most applications should use credentialBundlePath.  When using keyPath and certificateChainPath, your application needs to check that the key and leaf certificate are consistent, because it is possible to read the files mid-rotation.
+                 */
+                certificateChainPath?: string;
+                /**
+                 * Write the credential bundle at this path in the projected volume.
+                 *
+                 * The credential bundle is a single file that contains multiple PEM blocks. The first PEM block is a PRIVATE KEY block, containing a PKCS#8 private key.
+                 *
+                 * The remaining blocks are CERTIFICATE blocks, containing the issued certificate chain from the signer (leaf and any intermediates).
+                 *
+                 * Using credentialBundlePath lets your Pod's application code make a single atomic read that retrieves a consistent key and certificate chain.  If you project them to separate files, your application code will need to additionally check that the leaf certificate was issued to the key.
+                 */
+                credentialBundlePath?: string;
+                /**
+                 * Write the key at this path in the projected volume.
+                 *
+                 * Most applications should use credentialBundlePath.  When using keyPath and certificateChainPath, your application needs to check that the key and leaf certificate are consistent, because it is possible to read the files mid-rotation.
+                 */
+                keyPath?: string;
+                /**
+                 * The type of keypair Kubelet will generate for the pod.
+                 *
+                 * Valid values are "RSA3072", "RSA4096", "ECDSAP256", "ECDSAP384", "ECDSAP521", and "ED25519".
+                 */
+                keyType: string;
+                /**
+                 * maxExpirationSeconds is the maximum lifetime permitted for the certificate.
+                 *
+                 * Kubelet copies this value verbatim into the PodCertificateRequests it generates for this projection.
+                 *
+                 * If omitted, kube-apiserver will set it to 86400(24 hours). kube-apiserver will reject values shorter than 3600 (1 hour).  The maximum allowable value is 7862400 (91 days).
+                 *
+                 * The signer implementation is then free to issue a certificate with any lifetime *shorter* than MaxExpirationSeconds, but no shorter than 3600 seconds (1 hour).  This constraint is enforced by kube-apiserver. `kubernetes.io` signers will never issue certificates with a lifetime longer than 24 hours.
+                 */
+                maxExpirationSeconds?: number;
+                /**
+                 * Kubelet's generated CSRs will be addressed to this signer.
+                 */
+                signerName: string;
+                /**
+                 * userAnnotations allow pod authors to pass additional information to the signer implementation.  Kubernetes does not restrict or validate this metadata in any way.
+                 *
+                 * These values are copied verbatim into the `spec.unverifiedUserAnnotations` field of the PodCertificateRequest objects that Kubelet creates.
+                 *
+                 * Entries are subject to the same validation as object metadata annotations, with the addition that all keys must be domain-prefixed. No restrictions are placed on values, except an overall size limitation on the entire field.
+                 *
+                 * Signers should document the keys and values they support. Signers should deny requests that contain keys they do not recognize.
+                 */
+                userAnnotations?: {
+                  [k: string]: string;
+                };
+                [k: string]: unknown;
+              };
+              /**
                * Adapts a secret into a projected volume.
                *
                * The contents of the target Secret's Data field will be presented in a projected volume as files using the keys in the Data field as the file names. Note that this is identical to a secret volume source without the default mode.
@@ -6821,6 +7040,24 @@ export interface BatchV1Job {
           };
           [k: string]: unknown;
         }[];
+        /**
+         * WorkloadReference identifies the Workload object and PodGroup membership that a Pod belongs to. The scheduler uses this information to apply workload-aware scheduling semantics.
+         */
+        workloadRef?: {
+          /**
+           * Name defines the name of the Workload object this Pod belongs to. Workload must be in the same namespace as the Pod. If it doesn't match any existing Workload, the Pod will remain unschedulable until a Workload object is created and observed by the kube-scheduler. It must be a DNS subdomain.
+           */
+          name: string;
+          /**
+           * PodGroup is the name of the PodGroup within the Workload that this Pod belongs to. If it doesn't match any existing PodGroup within the Workload, the Pod will remain unschedulable until the Workload object is recreated and observed by the kube-scheduler. It must be a DNS label.
+           */
+          podGroup: string;
+          /**
+           * PodGroupReplicaKey specifies the replica key of the PodGroup to which this Pod belongs. It is used to distinguish pods belonging to different replicas of the same pod group. The pod group policy is applied separately to each replica. When set, it must be a DNS label.
+           */
+          podGroupReplicaKey?: string;
+          [k: string]: unknown;
+        };
         [k: string]: unknown;
       };
       [k: string]: unknown;

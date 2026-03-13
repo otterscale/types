@@ -1,10 +1,9 @@
-/** Generated from Remote JSON Schema for groupsnapshot.storage.k8s.io.v1beta1.VolumeGroupSnapshot */
+/** Generated from Remote JSON Schema for ceph.rook.io.v1.CephRBDMirror */
 
 /**
- * VolumeGroupSnapshot is a user's request for creating either a point-in-time
- * group snapshot or binding to a pre-existing group snapshot.
+ * CephRBDMirror represents a Ceph RBD Mirror
  */
-export interface GroupsnapshotStorageK8SIoV1Beta1VolumeGroupSnapshot {
+export interface CephRookIoV1CephRBDMirror {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -16,7 +15,7 @@ export interface GroupsnapshotStorageK8SIoV1Beta1VolumeGroupSnapshot {
   /**
    * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
    */
-  metadata?: {
+  metadata: {
     /**
      * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
      */
@@ -156,137 +155,348 @@ export interface GroupsnapshotStorageK8SIoV1Beta1VolumeGroupSnapshot {
     [k: string]: unknown;
   };
   /**
-   * Spec defines the desired characteristics of a group snapshot requested by a user.
-   * Required.
+   * RBDMirroringSpec represents the specification of an RBD mirror daemon
    */
   spec: {
     /**
-     * Source specifies where a group snapshot will be created from.
-     * This field is immutable after creation.
-     * Required.
+     * The annotations-related configuration to add/set on each Pod related object.
      */
-    source: {
+    annotations?: {
+      [k: string]: string;
+    };
+    /**
+     * Count represents the number of rbd mirror instance to run
+     */
+    count: number;
+    /**
+     * The labels-related configuration to add/set on each Pod related object.
+     */
+    labels?: {
+      [k: string]: string;
+    };
+    /**
+     * Peers represents the peers spec
+     */
+    peers?: {
       /**
-       * Selector is a label query over persistent volume claims that are to be
-       * grouped together for snapshotting.
-       * This labelSelector will be used to match the label added to a PVC.
-       * If the label is added or removed to a volume after a group snapshot
-       * is created, the existing group snapshots won't be modified.
-       * Once a VolumeGroupSnapshotContent is created and the sidecar starts to process
-       * it, the volume list will not change with retries.
+       * SecretNames represents the Kubernetes Secret names to add rbd-mirror or cephfs-mirror peers
        */
-      selector?: {
-        /**
-         * matchExpressions is a list of label selector requirements. The requirements are ANDed.
-         */
-        matchExpressions?: {
-          /**
-           * key is the label key that the selector applies to.
-           */
-          key: string;
-          /**
-           * operator represents a key's relationship to a set of values.
-           * Valid operators are In, NotIn, Exists and DoesNotExist.
-           */
-          operator: string;
-          /**
-           * values is an array of string values. If the operator is In or NotIn,
-           * the values array must be non-empty. If the operator is Exists or DoesNotExist,
-           * the values array must be empty. This array is replaced during a strategic
-           * merge patch.
-           */
-          values?: string[];
+      secretNames?: string[];
+      [k: string]: unknown;
+    };
+    placement?: {
+      nodeAffinity?: {
+        preferredDuringSchedulingIgnoredDuringExecution?: {
+          preference: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchFields?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            [k: string]: unknown;
+          };
+          weight: number;
           [k: string]: unknown;
         }[];
-        /**
-         * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
-         * map is equivalent to an element of matchExpressions, whose key field is "key", the
-         * operator is "In", and the values array contains only "value". The requirements are ANDed.
-         */
-        matchLabels?: {
-          [k: string]: string;
+        requiredDuringSchedulingIgnoredDuringExecution?: {
+          nodeSelectorTerms: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchFields?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            [k: string]: unknown;
+          }[];
+          [k: string]: unknown;
         };
         [k: string]: unknown;
       };
-      /**
-       * VolumeGroupSnapshotContentName specifies the name of a pre-existing VolumeGroupSnapshotContent
-       * object representing an existing volume group snapshot.
-       * This field should be set if the volume group snapshot already exists and
-       * only needs a representation in Kubernetes.
-       * This field is immutable.
-       */
-      volumeGroupSnapshotContentName?: string;
+      podAffinity?: {
+        preferredDuringSchedulingIgnoredDuringExecution?: {
+          podAffinityTerm: {
+            labelSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            matchLabelKeys?: string[];
+            mismatchLabelKeys?: string[];
+            namespaceSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            namespaces?: string[];
+            topologyKey: string;
+            [k: string]: unknown;
+          };
+          weight: number;
+          [k: string]: unknown;
+        }[];
+        requiredDuringSchedulingIgnoredDuringExecution?: {
+          labelSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          matchLabelKeys?: string[];
+          mismatchLabelKeys?: string[];
+          namespaceSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          namespaces?: string[];
+          topologyKey: string;
+          [k: string]: unknown;
+        }[];
+        [k: string]: unknown;
+      };
+      podAntiAffinity?: {
+        preferredDuringSchedulingIgnoredDuringExecution?: {
+          podAffinityTerm: {
+            labelSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            matchLabelKeys?: string[];
+            mismatchLabelKeys?: string[];
+            namespaceSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            namespaces?: string[];
+            topologyKey: string;
+            [k: string]: unknown;
+          };
+          weight: number;
+          [k: string]: unknown;
+        }[];
+        requiredDuringSchedulingIgnoredDuringExecution?: {
+          labelSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          matchLabelKeys?: string[];
+          mismatchLabelKeys?: string[];
+          namespaceSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          namespaces?: string[];
+          topologyKey: string;
+          [k: string]: unknown;
+        }[];
+        [k: string]: unknown;
+      };
+      tolerations?: {
+        effect?: string;
+        key?: string;
+        operator?: string;
+        tolerationSeconds?: number;
+        value?: string;
+        [k: string]: unknown;
+      }[];
+      topologySpreadConstraints?: {
+        labelSelector?: {
+          matchExpressions?: {
+            key: string;
+            operator: string;
+            values?: string[];
+            [k: string]: unknown;
+          }[];
+          matchLabels?: {
+            [k: string]: string;
+          };
+          [k: string]: unknown;
+        };
+        matchLabelKeys?: string[];
+        maxSkew: number;
+        minDomains?: number;
+        nodeAffinityPolicy?: string;
+        nodeTaintsPolicy?: string;
+        topologyKey: string;
+        whenUnsatisfiable: string;
+        [k: string]: unknown;
+      }[];
       [k: string]: unknown;
     };
     /**
-     * VolumeGroupSnapshotClassName is the name of the VolumeGroupSnapshotClass
-     * requested by the VolumeGroupSnapshot.
-     * VolumeGroupSnapshotClassName may be left nil to indicate that the default
-     * class will be used.
-     * Empty string is not allowed for this field.
+     * PriorityClassName sets priority class on the rbd mirror pods
      */
-    volumeGroupSnapshotClassName?: string;
+    priorityClassName?: string;
+    /**
+     * The resource requirements for the rbd mirror pods
+     */
+    resources?: {
+      /**
+       * Claims lists the names of resources, defined in spec.resourceClaims,
+       * that are used by this container.
+       *
+       * This field depends on the
+       * DynamicResourceAllocation feature gate.
+       *
+       * This field is immutable. It can only be set for containers.
+       */
+      claims?: {
+        /**
+         * Name must match the name of one entry in pod.spec.resourceClaims of
+         * the Pod where this field is used. It makes that resource available
+         * inside a container.
+         */
+        name: string;
+        /**
+         * Request is the name chosen for a request in the referenced claim.
+         * If empty, everything from the claim is made available, otherwise
+         * only the result of this request.
+         */
+        request?: string;
+        [k: string]: unknown;
+      }[];
+      /**
+       * Limits describes the maximum amount of compute resources allowed.
+       * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+       */
+      limits?: {
+        [k: string]: number | string;
+      };
+      /**
+       * Requests describes the minimum amount of compute resources required.
+       * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+       * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+       * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+       */
+      requests?: {
+        [k: string]: number | string;
+      };
+      [k: string]: unknown;
+    };
     [k: string]: unknown;
   };
   /**
-   * Status represents the current information of a group snapshot.
-   * Consumers must verify binding between VolumeGroupSnapshot and
-   * VolumeGroupSnapshotContent objects is successful (by validating that both
-   * VolumeGroupSnapshot and VolumeGroupSnapshotContent point to each other) before
-   * using this object.
+   * RBDMirrorStatus represents the status of the RBD mirror resource
    */
   status?: {
-    /**
-     * BoundVolumeGroupSnapshotContentName is the name of the VolumeGroupSnapshotContent
-     * object to which this VolumeGroupSnapshot object intends to bind to.
-     * If not specified, it indicates that the VolumeGroupSnapshot object has not
-     * been successfully bound to a VolumeGroupSnapshotContent object yet.
-     * NOTE: To avoid possible security issues, consumers must verify binding between
-     * VolumeGroupSnapshot and VolumeGroupSnapshotContent objects is successful
-     * (by validating that both VolumeGroupSnapshot and VolumeGroupSnapshotContent
-     * point at each other) before using this object.
-     */
-    boundVolumeGroupSnapshotContentName?: string;
-    /**
-     * CreationTime is the timestamp when the point-in-time group snapshot is taken
-     * by the underlying storage system.
-     * If not specified, it may indicate that the creation time of the group snapshot
-     * is unknown.
-     * The format of this field is a Unix nanoseconds time encoded as an int64.
-     * On Unix, the command date +%s%N returns the current time in nanoseconds
-     * since 1970-01-01 00:00:00 UTC.
-     * This field is updated based on the CreationTime field in VolumeGroupSnapshotContentStatus
-     */
-    creationTime?: string;
-    /**
-     * Error is the last observed error during group snapshot creation, if any.
-     * This field could be helpful to upper level controllers (i.e., application
-     * controller) to decide whether they should continue on waiting for the group
-     * snapshot to be created based on the type of error reported.
-     * The snapshot controller will keep retrying when an error occurs during the
-     * group snapshot creation. Upon success, this error field will be cleared.
-     */
-    error?: {
+    cephx?: {
       /**
-       * message is a string detailing the encountered error during snapshot
-       * creation if specified.
-       * NOTE: message may be logged, and it should not contain sensitive
-       * information.
+       * Daemon shows the CephX key status for local Ceph daemons associated with this resources.
        */
-      message?: string;
-      /**
-       * time is the timestamp when the error was encountered.
-       */
-      time?: string;
+      daemon?: {
+        /**
+         * KeyCephVersion reports the Ceph version that created the current generation's keys. This is
+         * same string format as reported by `CephCluster.status.version.version` to allow them to be
+         * compared. E.g., `20.2.0-0`.
+         * For all newly-created resources, this field set to the version of Ceph that created the key.
+         * The special value "Uninitialized" indicates that keys are being created for the first time.
+         * An empty string indicates that the version is unknown, as expected in brownfield deployments.
+         */
+        keyCephVersion?: string;
+        /**
+         * KeyGeneration represents the CephX key generation for the last successful reconcile.
+         * For all newly-created resources, this field is set to `1`.
+         * When keys are rotated due to any rotation policy, the generation is incremented or updated to
+         * the configured policy generation.
+         * Generation `0` indicates that keys existed prior to the implementation of key tracking.
+         */
+        keyGeneration?: number;
+        [k: string]: unknown;
+      };
       [k: string]: unknown;
     };
+    conditions?: {
+      lastHeartbeatTime?: string;
+      lastTransitionTime?: string;
+      message?: string;
+      /**
+       * ConditionReason is a reason for a condition
+       */
+      reason?: string;
+      status?: string;
+      /**
+       * ConditionType represent a resource's status
+       */
+      type?: string;
+      [k: string]: unknown;
+    }[];
     /**
-     * ReadyToUse indicates if all the individual snapshots in the group are ready
-     * to be used to restore a group of volumes.
-     * ReadyToUse becomes true when ReadyToUse of all individual snapshots become true.
-     * If not specified, it means the readiness of a group snapshot is unknown.
+     * ObservedGeneration is the latest generation observed by the controller.
      */
-    readyToUse?: boolean;
+    observedGeneration?: number;
+    phase?: string;
     [k: string]: unknown;
   };
   [k: string]: unknown;

@@ -1,5 +1,3 @@
-import { toJson } from "@bufbuild/protobuf";
-import { StructSchema } from "@bufbuild/protobuf/wkt";
 import { createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-node";
 import fs from "fs";
@@ -50,26 +48,36 @@ const INCLUDE_GROUPS = new Set([
   "authorization.k8s.io",
   "autoscaling",
   "batch",
+  "cdi.kubevirt.io",
+  "ceph.rook.io",
   "certificates.k8s.io",
+  "clone.kubevirt.io",
   "coordination.k8s.io",
   "discovery.k8s.io",
   "events.k8s.io",
+  "export.kubevirt.io",
+  "fleet.otterscale.io",
   "flowcontrol.apiserver.k8s.io",
   "gateway.networking.k8s.io",
-  "groupsnapshot.storage.k8s.io",
+  "helm.toolkit.fluxcd.io",
   "inference.networking.k8s.io",
-  "metrics.k8s.io",
+  "instancetype.kubevirt.io",
+  "kustomize.toolkit.fluxcd.io",
+  "migrations.kubevirt.io",
+  "model.otterscale.io",
+  "module.otterscale.io",
   "networking.k8s.io",
   "node.k8s.io",
   "policy",
+  "pool.kubevirt.io",
   "rbac.authorization.k8s.io",
+  "resource.k8s.io",
   "scheduling.k8s.io",
-  "snapshot.storage.k8s.io",
+  "snapshot.kubevirt.io",
+  "source.toolkit.fluxcd.io",
   "storage.k8s.io",
-  "model.otterscale.io",
-  "module.otterscale.io",
-  "workload.otterscale.io",
   "tenant.otterscale.io",
+  "workload.otterscale.io",
 ]);
 
 const transport = createConnectTransport({
@@ -152,7 +160,7 @@ async function main() {
         const gvk = `${res.group ? res.group : "core"}.${res.version}.${res.kind}`;
 
         // Convert Protobuf Struct to JSON Object
-        const jsonSchema = toJson(StructSchema, schemaRes) as JSONSchema;
+        const jsonSchema = schemaRes.schema as JSONSchema;
 
         // Add title for TS interface naming
         jsonSchema.title = gvk;

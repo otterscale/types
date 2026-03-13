@@ -1,9 +1,9 @@
-/** Generated from Remote JSON Schema for metrics.k8s.io.v1beta1.NodeMetrics */
+/** Generated from Remote JSON Schema for export.kubevirt.io.v1alpha1.VirtualMachineExport */
 
 /**
- * NodeMetrics sets resource usage metrics of a node.
+ * VirtualMachineExport defines the operation of exporting a VM source
  */
-export interface MetricsK8SIoV1Beta1NodeMetrics {
+export interface ExportKubevirtIoV1Alpha1VirtualMachineExport {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -155,57 +155,180 @@ export interface MetricsK8SIoV1Beta1NodeMetrics {
     [k: string]: unknown;
   };
   /**
-   * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+   * VirtualMachineExportSpec is the spec for a VirtualMachineExport resource
    */
-  timestamp: string;
-  /**
-   * The memory usage is the memory working set.
-   */
-  usage: {
+  spec: {
     /**
-     * Quantity is a fixed-point representation of a number. It provides convenient marshaling/unmarshaling in JSON and YAML, in addition to String() and AsInt64() accessors.
-     *
-     * The serialization format is:
-     *
-     * ``` <quantity>        ::= <signedNumber><suffix>
-     *
-     * 	(Note that <suffix> may be empty, from the "" case in <decimalSI>.)
-     *
-     * <digit>           ::= 0 | 1 | ... | 9 <digits>          ::= <digit> | <digit><digits> <number>          ::= <digits> | <digits>.<digits> | <digits>. | .<digits> <sign>            ::= "+" | "-" <signedNumber>    ::= <number> | <sign><number> <suffix>          ::= <binarySI> | <decimalExponent> | <decimalSI> <binarySI>        ::= Ki | Mi | Gi | Ti | Pi | Ei
-     *
-     * 	(International System of units; See: http://physics.nist.gov/cuu/Units/binary.html)
-     *
-     * <decimalSI>       ::= m | "" | k | M | G | T | P | E
-     *
-     * 	(Note that 1024 = 1Ki but 1000 = 1k; I didn't choose the capitalization.)
-     *
-     * <decimalExponent> ::= "e" <signedNumber> | "E" <signedNumber> ```
-     *
-     * No matter which of the three exponent forms is used, no quantity may represent a number greater than 2^63-1 in magnitude, nor may it have more than 3 decimal places. Numbers larger or more precise will be capped or rounded up. (E.g.: 0.1m will rounded up to 1m.) This may be extended in the future if we require larger or smaller quantities.
-     *
-     * When a Quantity is parsed from a string, it will remember the type of suffix it had, and will use the same type again when it is serialized.
-     *
-     * Before serializing, Quantity will be put in "canonical form". This means that Exponent/suffix will be adjusted up or down (with a corresponding increase or decrease in Mantissa) such that:
-     *
-     * - No precision is lost - No fractional digits will be emitted - The exponent (or suffix) is as large as possible.
-     *
-     * The sign will be omitted unless the number is negative.
-     *
-     * Examples:
-     *
-     * - 1.5 will be serialized as "1500m" - 1.5Gi will be serialized as "1536Mi"
-     *
-     * Note that the quantity will NEVER be internally represented by a floating point number. That is the whole point of this exercise.
-     *
-     * Non-canonical values will still parse as long as they are well formed, but will be re-emitted in their canonical form. (So always use canonical form, or don't diff.)
-     *
-     * This format is intended to make it difficult to use these numbers without writing some sort of special handling code in the hopes that that will cause implementors to also use a fixed point implementation.
+     * TypedLocalObjectReference contains enough information to let you locate the
+     * typed referenced object inside the same namespace.
      */
-    [k: string]: string | number;
+    source: {
+      /**
+       * APIGroup is the group for the resource being referenced.
+       * If APIGroup is not specified, the specified Kind must be in the core API group.
+       * For any other third-party types, APIGroup is required.
+       */
+      apiGroup?: string;
+      /**
+       * Kind is the type of resource being referenced
+       */
+      kind: string;
+      /**
+       * Name is the name of resource being referenced
+       */
+      name: string;
+      [k: string]: unknown;
+    };
+    /**
+     * TokenSecretRef is the name of the custom-defined secret that contains the token used by the export server pod
+     */
+    tokenSecretRef?: string;
+    /**
+     * ttlDuration limits the lifetime of an export
+     * If this field is set, after this duration has passed from counting from CreationTimestamp,
+     * the export is eligible to be automatically deleted.
+     * If this field is omitted, a reasonable default is applied.
+     */
+    ttlDuration?: string;
+    [k: string]: unknown;
   };
   /**
-   * Duration is a wrapper around time.Duration which supports correct marshaling to YAML and JSON. In particular, it marshals into strings, which can be used as map keys in json.
+   * VirtualMachineExportStatus is the status for a VirtualMachineExport resource
    */
-  window: string;
+  status?: {
+    conditions?: {
+      lastProbeTime?: string;
+      lastTransitionTime?: string;
+      message?: string;
+      reason?: string;
+      status: string;
+      /**
+       * ConditionType is the const type for Conditions
+       */
+      type: string;
+      [k: string]: unknown;
+    }[];
+    /**
+     * VirtualMachineExportLinks contains the links that point the exported VM resources
+     */
+    links?: {
+      /**
+       * VirtualMachineExportLink contains a list of volumes available for export, as well as the URLs to obtain these volumes
+       */
+      external?: {
+        /**
+         * Cert is the public CA certificate base64 encoded
+         */
+        cert: string;
+        /**
+         * Manifests is a list of available manifests for the export
+         */
+        manifests?: {
+          /**
+           * Type is the type of manifest returned
+           */
+          type: string;
+          /**
+           * Url is the url of the endpoint that returns the manifest
+           */
+          url: string;
+          [k: string]: unknown;
+        }[];
+        /**
+         * Volumes is a list of available volumes to export
+         */
+        volumes?: {
+          formats?: {
+            /**
+             * Format is the format of the image at the specified URL
+             */
+            format: string;
+            /**
+             * Url is the url that contains the volume in the format specified
+             */
+            url: string;
+            [k: string]: unknown;
+          }[];
+          /**
+           * Name is the name of the exported volume
+           */
+          name: string;
+          [k: string]: unknown;
+        }[];
+        [k: string]: unknown;
+      };
+      /**
+       * VirtualMachineExportLink contains a list of volumes available for export, as well as the URLs to obtain these volumes
+       */
+      internal?: {
+        /**
+         * Cert is the public CA certificate base64 encoded
+         */
+        cert: string;
+        /**
+         * Manifests is a list of available manifests for the export
+         */
+        manifests?: {
+          /**
+           * Type is the type of manifest returned
+           */
+          type: string;
+          /**
+           * Url is the url of the endpoint that returns the manifest
+           */
+          url: string;
+          [k: string]: unknown;
+        }[];
+        /**
+         * Volumes is a list of available volumes to export
+         */
+        volumes?: {
+          formats?: {
+            /**
+             * Format is the format of the image at the specified URL
+             */
+            format: string;
+            /**
+             * Url is the url that contains the volume in the format specified
+             */
+            url: string;
+            [k: string]: unknown;
+          }[];
+          /**
+           * Name is the name of the exported volume
+           */
+          name: string;
+          [k: string]: unknown;
+        }[];
+        [k: string]: unknown;
+      };
+      [k: string]: unknown;
+    };
+    /**
+     * VirtualMachineExportPhase is the current phase of the VirtualMachineExport
+     */
+    phase?: string;
+    /**
+     * ServiceName is the name of the service created associated with the Virtual Machine export. It will be used to
+     * create the internal URLs for downloading the images
+     */
+    serviceName?: string;
+    /**
+     * TokenSecretRef is the name of the secret that contains the token used by the export server pod
+     */
+    tokenSecretRef?: string;
+    /**
+     * The time at which the VM Export will be completely removed according to specified TTL
+     * Formula is CreationTimestamp + TTL
+     */
+    ttlExpirationTime?: string;
+    /**
+     * VirtualMachineName shows the name of the source virtual machine if the source is either a VirtualMachine or
+     * a VirtualMachineSnapshot. This is mainly to easily identify the source VirtualMachine in case of a
+     * VirtualMachineSnapshot
+     */
+    virtualMachineName?: string;
+    [k: string]: unknown;
+  };
   [k: string]: unknown;
 }

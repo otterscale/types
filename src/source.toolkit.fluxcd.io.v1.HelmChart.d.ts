@@ -1,10 +1,9 @@
-/** Generated from Remote JSON Schema for snapshot.storage.k8s.io.v1.VolumeSnapshot */
+/** Generated from Remote JSON Schema for source.toolkit.fluxcd.io.v1.HelmChart */
 
 /**
- * VolumeSnapshot is a user's request for either creating a point-in-time
- * snapshot of a persistent volume, or binding to a pre-existing snapshot.
+ * HelmChart is the Schema for the helmcharts API.
  */
-export interface SnapshotStorageK8SIoV1VolumeSnapshot {
+export interface SourceToolkitFluxcdIoV1HelmChart {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -156,134 +155,234 @@ export interface SnapshotStorageK8SIoV1VolumeSnapshot {
     [k: string]: unknown;
   };
   /**
-   * spec defines the desired characteristics of a snapshot requested by a user.
-   * More info: https://kubernetes.io/docs/concepts/storage/volume-snapshots#volumesnapshots
-   * Required.
+   * HelmChartSpec specifies the desired state of a Helm chart.
    */
-  spec: {
+  spec?: {
     /**
-     * source specifies where a snapshot will be created from.
-     * This field is immutable after creation.
-     * Required.
+     * Chart is the name or path the Helm chart is available at in the
+     * SourceRef.
      */
-    source: {
+    chart: string;
+    /**
+     * IgnoreMissingValuesFiles controls whether to silently ignore missing values
+     * files rather than failing.
+     */
+    ignoreMissingValuesFiles?: boolean;
+    /**
+     * Interval at which the HelmChart SourceRef is checked for updates.
+     * This interval is approximate and may be subject to jitter to ensure
+     * efficient use of resources.
+     */
+    interval: string;
+    /**
+     * ReconcileStrategy determines what enables the creation of a new artifact.
+     * Valid values are ('ChartVersion', 'Revision').
+     * See the documentation of the values for an explanation on their behavior.
+     * Defaults to ChartVersion when omitted.
+     */
+    reconcileStrategy?: 'ChartVersion' | 'Revision';
+    /**
+     * SourceRef is the reference to the Source the chart is available at.
+     */
+    sourceRef: {
       /**
-       * persistentVolumeClaimName specifies the name of the PersistentVolumeClaim
-       * object representing the volume from which a snapshot should be created.
-       * This PVC is assumed to be in the same namespace as the VolumeSnapshot
-       * object.
-       * This field should be set if the snapshot does not exists, and needs to be
-       * created.
-       * This field is immutable.
+       * APIVersion of the referent.
        */
-      persistentVolumeClaimName?: string;
+      apiVersion?: string;
       /**
-       * volumeSnapshotContentName specifies the name of a pre-existing VolumeSnapshotContent
-       * object representing an existing volume snapshot.
-       * This field should be set if the snapshot already exists and only needs a representation in Kubernetes.
-       * This field is immutable.
+       * Kind of the referent, valid values are ('HelmRepository', 'GitRepository',
+       * 'Bucket').
        */
-      volumeSnapshotContentName?: string;
+      kind: 'HelmRepository' | 'GitRepository' | 'Bucket';
+      /**
+       * Name of the referent.
+       */
+      name: string;
       [k: string]: unknown;
     };
     /**
-     * VolumeSnapshotClassName is the name of the VolumeSnapshotClass
-     * requested by the VolumeSnapshot.
-     * VolumeSnapshotClassName may be left nil to indicate that the default
-     * SnapshotClass should be used.
-     * A given cluster may have multiple default Volume SnapshotClasses: one
-     * default per CSI Driver. If a VolumeSnapshot does not specify a SnapshotClass,
-     * VolumeSnapshotSource will be checked to figure out what the associated
-     * CSI Driver is, and the default VolumeSnapshotClass associated with that
-     * CSI Driver will be used. If more than one VolumeSnapshotClass exist for
-     * a given CSI Driver and more than one have been marked as default,
-     * CreateSnapshot will fail and generate an event.
-     * Empty string is not allowed for this field.
+     * Suspend tells the controller to suspend the reconciliation of this
+     * source.
      */
-    volumeSnapshotClassName?: string;
+    suspend?: boolean;
+    /**
+     * ValuesFiles is an alternative list of values files to use as the chart
+     * values (values.yaml is not included by default), expected to be a
+     * relative path in the SourceRef.
+     * Values files are merged in the order of this list with the last file
+     * overriding the first. Ignored when omitted.
+     */
+    valuesFiles?: string[];
+    /**
+     * Verify contains the secret name containing the trusted public keys
+     * used to verify the signature and specifies which provider to use to check
+     * whether OCI image is authentic.
+     * This field is only supported when using HelmRepository source with spec.type 'oci'.
+     * Chart dependencies, which are not bundled in the umbrella chart artifact, are not verified.
+     */
+    verify?: {
+      /**
+       * MatchOIDCIdentity specifies the identity matching criteria to use
+       * while verifying an OCI artifact which was signed using Cosign keyless
+       * signing. The artifact's identity is deemed to be verified if any of the
+       * specified matchers match against the identity.
+       */
+      matchOIDCIdentity?: {
+        /**
+         * Issuer specifies the regex pattern to match against to verify
+         * the OIDC issuer in the Fulcio certificate. The pattern must be a
+         * valid Go regular expression.
+         */
+        issuer: string;
+        /**
+         * Subject specifies the regex pattern to match against to verify
+         * the identity subject in the Fulcio certificate. The pattern must
+         * be a valid Go regular expression.
+         */
+        subject: string;
+        [k: string]: unknown;
+      }[];
+      /**
+       * Provider specifies the technology used to sign the OCI Artifact.
+       */
+      provider: 'cosign' | 'notation';
+      /**
+       * SecretRef specifies the Kubernetes Secret containing the
+       * trusted public keys.
+       */
+      secretRef?: {
+        /**
+         * Name of the referent.
+         */
+        name: string;
+        [k: string]: unknown;
+      };
+      [k: string]: unknown;
+    };
+    /**
+     * Version is the chart version semver expression, ignored for charts from
+     * GitRepository and Bucket sources. Defaults to latest when omitted.
+     */
+    version?: string;
     [k: string]: unknown;
   };
   /**
-   * status represents the current information of a snapshot.
-   * Consumers must verify binding between VolumeSnapshot and
-   * VolumeSnapshotContent objects is successful (by validating that both
-   * VolumeSnapshot and VolumeSnapshotContent point at each other) before
-   * using this object.
+   * HelmChartStatus records the observed state of the HelmChart.
    */
   status?: {
     /**
-     * boundVolumeSnapshotContentName is the name of the VolumeSnapshotContent
-     * object to which this VolumeSnapshot object intends to bind to.
-     * If not specified, it indicates that the VolumeSnapshot object has not been
-     * successfully bound to a VolumeSnapshotContent object yet.
-     * NOTE: To avoid possible security issues, consumers must verify binding between
-     * VolumeSnapshot and VolumeSnapshotContent objects is successful (by validating that
-     * both VolumeSnapshot and VolumeSnapshotContent point at each other) before using
-     * this object.
+     * Artifact represents the output of the last successful reconciliation.
      */
-    boundVolumeSnapshotContentName?: string;
-    /**
-     * creationTime is the timestamp when the point-in-time snapshot is taken
-     * by the underlying storage system.
-     * In dynamic snapshot creation case, this field will be filled in by the
-     * snapshot controller with the "creation_time" value returned from CSI
-     * "CreateSnapshot" gRPC call.
-     * For a pre-existing snapshot, this field will be filled with the "creation_time"
-     * value returned from the CSI "ListSnapshots" gRPC call if the driver supports it.
-     * If not specified, it may indicate that the creation time of the snapshot is unknown.
-     */
-    creationTime?: string;
-    /**
-     * error is the last observed error during snapshot creation, if any.
-     * This field could be helpful to upper level controllers(i.e., application controller)
-     * to decide whether they should continue on waiting for the snapshot to be created
-     * based on the type of error reported.
-     * The snapshot controller will keep retrying when an error occurs during the
-     * snapshot creation. Upon success, this error field will be cleared.
-     */
-    error?: {
+    artifact?: {
       /**
-       * message is a string detailing the encountered error during snapshot
-       * creation if specified.
-       * NOTE: message may be logged, and it should not contain sensitive
-       * information.
+       * Digest is the digest of the file in the form of '<algorithm>:<checksum>'.
        */
-      message?: string;
+      digest: string;
       /**
-       * time is the timestamp when the error was encountered.
+       * LastUpdateTime is the timestamp corresponding to the last update of the
+       * Artifact.
        */
-      time?: string;
+      lastUpdateTime: string;
+      /**
+       * Metadata holds upstream information such as OCI annotations.
+       */
+      metadata?: {
+        [k: string]: string;
+      };
+      /**
+       * Path is the relative file path of the Artifact. It can be used to locate
+       * the file in the root of the Artifact storage on the local file system of
+       * the controller managing the Source.
+       */
+      path: string;
+      /**
+       * Revision is a human-readable identifier traceable in the origin source
+       * system. It can be a Git commit SHA, Git tag, a Helm chart version, etc.
+       */
+      revision: string;
+      /**
+       * Size is the number of bytes in the file.
+       */
+      size?: number;
+      /**
+       * URL is the HTTP address of the Artifact as exposed by the controller
+       * managing the Source. It can be used to retrieve the Artifact for
+       * consumption, e.g. by another controller applying the Artifact contents.
+       */
+      url: string;
       [k: string]: unknown;
     };
     /**
-     * readyToUse indicates if the snapshot is ready to be used to restore a volume.
-     * In dynamic snapshot creation case, this field will be filled in by the
-     * snapshot controller with the "ready_to_use" value returned from CSI
-     * "CreateSnapshot" gRPC call.
-     * For a pre-existing snapshot, this field will be filled with the "ready_to_use"
-     * value returned from the CSI "ListSnapshots" gRPC call if the driver supports it,
-     * otherwise, this field will be set to "True".
-     * If not specified, it means the readiness of a snapshot is unknown.
+     * Conditions holds the conditions for the HelmChart.
      */
-    readyToUse?: boolean;
+    conditions?: {
+      /**
+       * lastTransitionTime is the last time the condition transitioned from one status to another.
+       * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+       */
+      lastTransitionTime: string;
+      /**
+       * message is a human readable message indicating details about the transition.
+       * This may be an empty string.
+       */
+      message: string;
+      /**
+       * observedGeneration represents the .metadata.generation that the condition was set based upon.
+       * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+       * with respect to the current state of the instance.
+       */
+      observedGeneration?: number;
+      /**
+       * reason contains a programmatic identifier indicating the reason for the condition's last transition.
+       * Producers of specific condition types may define expected values and meanings for this field,
+       * and whether the values are considered a guaranteed API.
+       * The value should be a CamelCase string.
+       * This field may not be empty.
+       */
+      reason: string;
+      /**
+       * status of the condition, one of True, False, Unknown.
+       */
+      status: 'True' | 'False' | 'Unknown';
+      /**
+       * type of condition in CamelCase or in foo.example.com/CamelCase.
+       */
+      type: string;
+      [k: string]: unknown;
+    }[];
     /**
-     * restoreSize represents the minimum size of volume required to create a volume
-     * from this snapshot.
-     * In dynamic snapshot creation case, this field will be filled in by the
-     * snapshot controller with the "size_bytes" value returned from CSI
-     * "CreateSnapshot" gRPC call.
-     * For a pre-existing snapshot, this field will be filled with the "size_bytes"
-     * value returned from the CSI "ListSnapshots" gRPC call if the driver supports it.
-     * When restoring a volume from this snapshot, the size of the volume MUST NOT
-     * be smaller than the restoreSize if it is specified, otherwise the restoration will fail.
-     * If not specified, it indicates that the size is unknown.
+     * LastHandledReconcileAt holds the value of the most recent
+     * reconcile request value, so a change of the annotation value
+     * can be detected.
      */
-    restoreSize?: (number | string) & string;
+    lastHandledReconcileAt?: string;
     /**
-     * VolumeGroupSnapshotName is the name of the VolumeGroupSnapshot of which this
-     * VolumeSnapshot is a part of.
+     * ObservedChartName is the last observed chart name as specified by the
+     * resolved chart reference.
      */
-    volumeGroupSnapshotName?: string;
+    observedChartName?: string;
+    /**
+     * ObservedGeneration is the last observed generation of the HelmChart
+     * object.
+     */
+    observedGeneration?: number;
+    /**
+     * ObservedSourceArtifactRevision is the last observed Artifact.Revision
+     * of the HelmChartSpec.SourceRef.
+     */
+    observedSourceArtifactRevision?: string;
+    /**
+     * ObservedValuesFiles are the observed value files of the last successful
+     * reconciliation.
+     * It matches the chart in the last successfully reconciled artifact.
+     */
+    observedValuesFiles?: string[];
+    /**
+     * URL is the dynamic fetch link for the latest Artifact.
+     * It is provided on a "best effort" basis, and using the precise
+     * BucketStatus.Artifact data is recommended.
+     */
+    url?: string;
     [k: string]: unknown;
   };
   [k: string]: unknown;

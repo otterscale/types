@@ -658,6 +658,10 @@ export interface ApiextensionsK8SIoV1CustomResourceDefinition {
        */
       message?: string;
       /**
+       * observedGeneration represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.
+       */
+      observedGeneration?: number;
+      /**
        * reason is a unique, one-word, CamelCase reason for the condition's last transition.
        */
       reason?: string;
@@ -671,6 +675,10 @@ export interface ApiextensionsK8SIoV1CustomResourceDefinition {
       type: string;
       [k: string]: unknown;
     }[];
+    /**
+     * The generation observed by the CRD controller.
+     */
+    observedGeneration?: number;
     /**
      * storedVersions lists all versions of CustomResources that were ever persisted. Tracking these versions allows a migration path for stored versions in etcd. The field is mutable so a migration controller can finish a migration to another version (ensuring no old objects are left in storage), and then remove the rest of the versions from this list. Versions may not be removed from `spec.versions` while they exist in this list.
      */

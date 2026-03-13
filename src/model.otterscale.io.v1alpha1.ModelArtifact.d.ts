@@ -227,8 +227,9 @@ export interface ModelOtterscaleIoV1Alpha1ModelArtifact {
      */
     target: {
       /**
-       * CredentialsSecretRef references a Secret containing OCI registry credentials.
-       * The Secret must contain "username" and "password" keys.
+       * CredentialsSecretRef references a Secret of type kubernetes.io/dockerconfigjson
+       * containing OCI registry credentials. The Secret is mounted into the Job Pod
+       * at /.docker/config.json so that kit push authenticates automatically.
        */
       credentialsSecretRef?: {
         /**

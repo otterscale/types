@@ -182,8 +182,6 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
     };
     /**
      * TargetRefs identifies an API object to apply the policy to.
-     * Only Services have Extended support. Implementations MAY support
-     * additional objects, with Implementation Specific support.
      * Note that this config applies to the entire referenced resource
      * by default, but this default may change in the future to provide
      * a more granular application of the policy.
@@ -204,9 +202,9 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
      *   example, a policy with a creation timestamp of "2021-07-15
      *   01:02:03" MUST be given precedence over a policy with a
      *   creation timestamp of "2021-07-15 01:02:04".
-     * * The policy appearing first in alphabetical order by {name}.
-     *   For example, a policy named `bar` is given precedence over a
-     *   policy named `baz`.
+     * * The policy appearing first in alphabetical order by {namespace}/{name}.
+     *   For example, a policy named `foo/bar` is given precedence over a
+     *   policy named `foo/baz`.
      *
      * For any BackendTLSPolicy that does not take precedence, the
      * implementation MUST ensure the `Accepted` Condition is set to
@@ -218,9 +216,28 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
      * clarified in a future release, the safest approach is to support a single
      * targetRef.
      *
-     * Support: Extended for Kubernetes Service
+     * Support Levels:
      *
-     * Support: Implementation-specific for any other resource
+     * * Extended: Kubernetes Service referenced by HTTPRoute backendRefs.
+     *
+     * * Implementation-Specific: Services not connected via HTTPRoute, and any
+     *   other kind of backend. Implementations MAY use BackendTLSPolicy for:
+     *   - Services not referenced by any Route (e.g., infrastructure services)
+     *   - Gateway feature backends (e.g., ExternalAuth, rate-limiting services)
+     *   - Service mesh workload-to-service communication
+     *   - Other resource types beyond Service
+     *
+     * Implementations SHOULD aim to ensure that BackendTLSPolicy behavior is consistent,
+     * even outside of the extended HTTPRoute -(backendRef) -> Service path.
+     * They SHOULD clearly document how BackendTLSPolicy is interpreted in these
+     * scenarios, including:
+     *   - Which resources beyond Service are supported
+     *   - How the policy is discovered and applied
+     *   - Any implementation-specific semantics or restrictions
+     *
+     * Note that this config applies to the entire referenced resource
+     * by default, but this default may change in the future to provide
+     * a more granular application of the policy.
      *
      * @minItems 1
      * @maxItems 16
@@ -371,8 +388,8 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
         [k: string]: unknown;
       }[];
       /**
-       * WellKnownCACertificates specifies whether system CA certificates may be used in
-       * the TLS handshake between the gateway and backend pod.
+       * WellKnownCACertificates specifies whether a well-known set of CA certificates
+       * may be used in the TLS handshake between the gateway and backend pod.
        *
        * If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
        * must be specified with at least one entry for a valid configuration. Only one of
@@ -382,9 +399,16 @@ export interface GatewayNetworkingK8SIoV1BackendTLSPolicy {
        * `Accepted` Condition on the BackendTLSPolicy is set to `status: False`, with
        * a Reason `Invalid`.
        *
+       * Valid values include:
+       * * "System" - indicates that well-known system CA certificates should be used.
+       *
+       * Implementations MAY define their own sets of CA certificates. Such definitions
+       * MUST use an implementation-specific, prefixed name, such as
+       * `mycompany.com/my-custom-ca-certificates`.
+       *
        * Support: Implementation-specific
        */
-      wellKnownCACertificates?: 'System';
+      wellKnownCACertificates?: string;
       [k: string]: unknown;
     };
     [k: string]: unknown;

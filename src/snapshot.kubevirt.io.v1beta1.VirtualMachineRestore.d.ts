@@ -1,30 +1,13 @@
-/** Generated from Remote JSON Schema for snapshot.storage.k8s.io.v1.VolumeSnapshotClass */
+/** Generated from Remote JSON Schema for snapshot.kubevirt.io.v1beta1.VirtualMachineRestore */
 
 /**
- * VolumeSnapshotClass specifies parameters that a underlying storage system uses when
- * creating a volume snapshot. A specific VolumeSnapshotClass is used by specifying its
- * name in a VolumeSnapshot object.
- * VolumeSnapshotClasses are non-namespaced
+ * VirtualMachineRestore defines the operation of restoring a VM
  */
-export interface SnapshotStorageK8SIoV1VolumeSnapshotClass {
+export interface SnapshotKubevirtIoV1Beta1VirtualMachineRestore {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
   apiVersion?: string;
-  /**
-   * deletionPolicy determines whether a VolumeSnapshotContent created through
-   * the VolumeSnapshotClass should be deleted when its bound VolumeSnapshot is deleted.
-   * Supported values are "Retain" and "Delete".
-   * "Retain" means that the VolumeSnapshotContent and its physical snapshot on underlying storage system are kept.
-   * "Delete" means that the VolumeSnapshotContent and its physical snapshot on underlying storage system are deleted.
-   * Required.
-   */
-  deletionPolicy: 'Delete' | 'Retain';
-  /**
-   * driver is the name of the storage driver that handles this VolumeSnapshotClass.
-   * Required.
-   */
-  driver: string;
   /**
    * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
    */
@@ -172,11 +155,94 @@ export interface SnapshotStorageK8SIoV1VolumeSnapshotClass {
     [k: string]: unknown;
   };
   /**
-   * parameters is a key-value map with storage driver specific parameters for creating snapshots.
-   * These values are opaque to Kubernetes.
+   * VirtualMachineRestoreSpec is the spec for a VirtualMachineRestore resource
    */
-  parameters?: {
-    [k: string]: string;
+  spec: {
+    /**
+     * If the target for the restore does not exist, it will be created. Patches holds JSON patches that would be
+     * applied to the target manifest before it's created. Patches should fit the target's Kind.
+     *
+     * Example for a patch: {"op": "replace", "path": "/metadata/name", "value": "new-vm-name"}
+     */
+    patches?: string[];
+    /**
+     * initially only VirtualMachine type supported
+     */
+    target: {
+      /**
+       * APIGroup is the group for the resource being referenced.
+       * If APIGroup is not specified, the specified Kind must be in the core API group.
+       * For any other third-party types, APIGroup is required.
+       */
+      apiGroup?: string;
+      /**
+       * Kind is the type of resource being referenced
+       */
+      kind: string;
+      /**
+       * Name is the name of resource being referenced
+       */
+      name: string;
+      [k: string]: unknown;
+    };
+    /**
+     * TargetReadinessPolicy defines how to handle the restore in case
+     * the target is not ready
+     */
+    targetReadinessPolicy?: string;
+    virtualMachineSnapshotName: string;
+    /**
+     * VolumeOwnershipPolicy defines what owns volumes once they're restored
+     */
+    volumeOwnershipPolicy?: string;
+    /**
+     * VolumeRestoreOverrides gives the option to change properties of each restored volume
+     * For example, specifying the name of the restored volume, or adding labels/annotations to it
+     */
+    volumeRestoreOverrides?: {
+      annotations?: {
+        [k: string]: string;
+      };
+      labels?: {
+        [k: string]: string;
+      };
+      restoreName?: string;
+      volumeName?: string;
+      [k: string]: unknown;
+    }[];
+    /**
+     * VolumeRestorePolicy defines how to handle the restore of snapshotted volumes
+     */
+    volumeRestorePolicy?: string;
+    [k: string]: unknown;
+  };
+  /**
+   * VirtualMachineRestoreStatus is the status for a VirtualMachineRestore resource
+   */
+  status?: {
+    complete?: boolean;
+    conditions?: {
+      lastProbeTime?: string;
+      lastTransitionTime?: string;
+      message?: string;
+      reason?: string;
+      status: string;
+      /**
+       * ConditionType is the const type for Conditions
+       */
+      type: string;
+      [k: string]: unknown;
+    }[];
+    deletedDataVolumes?: string[];
+    restoreTime?: string;
+    restores?: {
+      dataVolumeName?: string;
+      persistentVolumeClaim: string;
+      volumeName: string;
+      volumeSnapshotName: string;
+      [k: string]: unknown;
+    }[];
+    [k: string]: unknown;
   };
   [k: string]: unknown;
 }

@@ -500,6 +500,10 @@ export interface CoreV1Node {
       [k: string]: unknown;
     };
     /**
+     * DeclaredFeatures represents the features related to feature gates that are declared by the node.
+     */
+    declaredFeatures?: string[];
+    /**
      * NodeFeatures describes the set of features implemented by the CRI implementation. The features contained in the NodeFeatures should depend only on the cri implementation independent of runtime handlers.
      */
     features?: {
