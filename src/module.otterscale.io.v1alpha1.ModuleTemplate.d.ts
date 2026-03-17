@@ -562,7 +562,8 @@ export interface ModuleOtterscaleIoV1Alpha1ModuleTemplate {
         skipCRDs?: boolean;
         /**
          * Strategy defines the install strategy to use for this HelmRelease.
-         * Defaults to 'RemediateOnFailure'.
+         * Defaults to 'RemediateOnFailure', or 'RetryOnFailure' when the
+         * DefaultToRetryOnFailure feature gate is enabled.
          */
         strategy?: {
           /**
@@ -1028,7 +1029,8 @@ export interface ModuleOtterscaleIoV1Alpha1ModuleTemplate {
         serverSideApply?: 'enabled' | 'disabled' | 'auto';
         /**
          * Strategy defines the upgrade strategy to use for this HelmRelease.
-         * Defaults to 'RemediateOnFailure'.
+         * Defaults to 'RemediateOnFailure', or 'RetryOnFailure' when the
+         * DefaultToRetryOnFailure feature gate is enabled.
          */
         strategy?: {
           /**
