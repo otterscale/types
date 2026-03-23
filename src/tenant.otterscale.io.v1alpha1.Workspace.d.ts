@@ -220,6 +220,11 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
        */
       role: 'admin' | 'edit' | 'view';
       /**
+       * ServiceAccount indicates whether this member is a service account
+       * rather than a human user.
+       */
+      serviceAccount?: boolean;
+      /**
        * Subject is the unique identifier of the member (e.g., OIDC subject or username).
        * This identifier maps directly to the Kubernetes RBAC Subject.
        */

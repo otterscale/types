@@ -62,6 +62,7 @@ const INCLUDE_GROUPS = new Set([
   "helm.toolkit.fluxcd.io",
   "inference.networking.k8s.io",
   "instancetype.kubevirt.io",
+  "kubevirt.io",
   "kustomize.toolkit.fluxcd.io",
   "migrations.kubevirt.io",
   "model.otterscale.io",
