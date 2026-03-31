@@ -247,6 +247,10 @@ export interface CloneKubevirtIoV1Alpha1VirtualMachineClone {
       labelFilters?: string[];
       [k: string]: unknown;
     };
+    /**
+     * VolumeNamePolicy defines how to handle volume naming during the clone operation
+     */
+    volumeNamePolicy?: 'RandomizeNames' | 'PrefixTargetName';
     [k: string]: unknown;
   };
   status?: {

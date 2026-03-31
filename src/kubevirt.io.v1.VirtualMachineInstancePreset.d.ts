@@ -792,6 +792,12 @@ export interface KubevirtIoV1VirtualMachineInstancePreset {
             [k: string]: unknown;
           };
           /**
+           * InterfacePasstBinding connects to a given network using passt usermode networking.
+           */
+          passtBinding?: {
+            [k: string]: unknown;
+          };
+          /**
            * If specified, the virtual network interface will be placed on the guests pci address with the specified PCI address. For example: 0000:81:01.10
            */
           pciAddress?: string;
@@ -1122,6 +1128,10 @@ export interface KubevirtIoV1VirtualMachineInstancePreset {
               enabled?: boolean;
               [k: string]: unknown;
             };
+            /**
+             * Enabled determines if the feature should be enabled or disabled on the guest.
+             * Defaults to true.
+             */
             enabled?: boolean;
             [k: string]: unknown;
           };
@@ -1131,10 +1141,33 @@ export interface KubevirtIoV1VirtualMachineInstancePreset {
            */
           tlbflush?: {
             /**
+             * Direct allows sending the TLB flush command directly to the hypervisor.
+             * It can be useful to optimize performance in nested virtualization cases, such as Windows VBS.
+             */
+            direct?: {
+              /**
+               * Enabled determines if the feature should be enabled or disabled on the guest.
+               * Defaults to true.
+               */
+              enabled?: boolean;
+              [k: string]: unknown;
+            };
+            /**
              * Enabled determines if the feature should be enabled or disabled on the guest.
              * Defaults to true.
              */
             enabled?: boolean;
+            /**
+             * Extended allows the guest to execute partial TLB flushes. It can be helpful for general purpose workloads.
+             */
+            extended?: {
+              /**
+               * Enabled determines if the feature should be enabled or disabled on the guest.
+               * Defaults to true.
+               */
+              enabled?: boolean;
+              [k: string]: unknown;
+            };
             [k: string]: unknown;
           };
           /**
@@ -1434,8 +1467,38 @@ export interface KubevirtIoV1VirtualMachineInstancePreset {
          * The delta between MaxGuest and Guest is the amount of memory that can be hot(un)plugged.
          */
         maxGuest?: number | string;
+        /**
+         * ReservedOverhead configures the memory overhead applied to a VM
+         * and its characteristics.
+         */
+        reservedOverhead?: {
+          /**
+           * AddedOverhead determines the memory overhead that will be reserved
+           * for the VM. It increases the virt-launcher pod memory limit.
+           */
+          addedOverhead?: number | string;
+          /**
+           * RequiresLock determines whether the VM's and its overhead memory
+           * need to be locked or not. It is a common practice to enable this
+           * if vDPA, VFIO or any other specialized hardware that depends on
+           * DMA is being used by the VM.
+           * False - (Default) memory lock RLimits are not modified.
+           * True - Memory lock RLimits will be updated to consider VM memory
+           *        size and memory overhead
+           */
+          memLock?: 'NotRequired' | 'Required';
+          [k: string]: unknown;
+        };
         [k: string]: unknown;
       };
+      /**
+       * RebootPolicy specifies how the guest should behave on reboot.
+       * Reboot (default): The guest is allowed to reboot silently.
+       * Terminate: The VMI will be terminated on guest reboot, allowing
+       * higher level controllers (such as the VM controller) to recreate
+       * the VMI with any updated configuration such as boot order changes.
+       */
+      rebootPolicy?: 'Reboot' | 'Terminate';
       /**
        * Resources describes the Compute Resources required by this vmi.
        */

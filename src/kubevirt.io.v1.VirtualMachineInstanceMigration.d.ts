@@ -319,6 +319,12 @@ export interface KubevirtIoV1VirtualMachineInstanceMigration {
          * indicates the migration will be unsafe to the guest. Defaults to false
          */
         unsafeMigrationOverride?: boolean;
+        /**
+         * UtilityVolumesTimeout is the maximum number of seconds a migration can wait in Pending state
+         * for utility volumes to be detached. If utility volumes are still present after this timeout,
+         * the migration will be marked as Failed. Defaults to 150
+         */
+        utilityVolumesTimeout?: number;
         [k: string]: unknown;
       };
       /**
@@ -413,6 +419,10 @@ export interface KubevirtIoV1VirtualMachineInstanceMigration {
       targetDirectMigrationNodePorts?: {
         [k: string]: number;
       };
+      /**
+       * TargetMemoryOverhead is the memory overhead of the target virt-launcher pod
+       */
+      targetMemoryOverhead?: number | string;
       /**
        * The target node that the VMI is moving to
        */

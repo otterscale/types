@@ -217,6 +217,27 @@ export interface ExportKubevirtIoV1Beta1VirtualMachineExport {
        */
       external?: {
         /**
+         * Backups is a list of available backups for the export
+         */
+        backups?: {
+          endpoints?: {
+            /**
+             * Endpoint is the endpoint of the backup export at the specified URL
+             */
+            endpoint: string;
+            /**
+             * Url is the url that contains the volume in the format specified
+             */
+            url: string;
+            [k: string]: unknown;
+          }[];
+          /**
+           * Name is the name of the exported volume
+           */
+          name: string;
+          [k: string]: unknown;
+        }[];
+        /**
          * Cert is the public CA certificate base64 encoded
          */
         cert: string;
@@ -261,6 +282,27 @@ export interface ExportKubevirtIoV1Beta1VirtualMachineExport {
        * VirtualMachineExportLink contains a list of volumes available for export, as well as the URLs to obtain these volumes
        */
       internal?: {
+        /**
+         * Backups is a list of available backups for the export
+         */
+        backups?: {
+          endpoints?: {
+            /**
+             * Endpoint is the endpoint of the backup export at the specified URL
+             */
+            endpoint: string;
+            /**
+             * Url is the url that contains the volume in the format specified
+             */
+            url: string;
+            [k: string]: unknown;
+          }[];
+          /**
+           * Name is the name of the exported volume
+           */
+          name: string;
+          [k: string]: unknown;
+        }[];
         /**
          * Cert is the public CA certificate base64 encoded
          */

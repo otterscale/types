@@ -651,6 +651,10 @@ export interface InstancetypeKubevirtIoV1Beta1VirtualMachineClusterPreference {
             enabled?: boolean;
             [k: string]: unknown;
           };
+          /**
+           * Enabled determines if the feature should be enabled or disabled on the guest.
+           * Defaults to true.
+           */
           enabled?: boolean;
           [k: string]: unknown;
         };
@@ -660,10 +664,33 @@ export interface InstancetypeKubevirtIoV1Beta1VirtualMachineClusterPreference {
          */
         tlbflush?: {
           /**
+           * Direct allows sending the TLB flush command directly to the hypervisor.
+           * It can be useful to optimize performance in nested virtualization cases, such as Windows VBS.
+           */
+          direct?: {
+            /**
+             * Enabled determines if the feature should be enabled or disabled on the guest.
+             * Defaults to true.
+             */
+            enabled?: boolean;
+            [k: string]: unknown;
+          };
+          /**
            * Enabled determines if the feature should be enabled or disabled on the guest.
            * Defaults to true.
            */
           enabled?: boolean;
+          /**
+           * Extended allows the guest to execute partial TLB flushes. It can be helpful for general purpose workloads.
+           */
+          extended?: {
+            /**
+             * Enabled determines if the feature should be enabled or disabled on the guest.
+             * Defaults to true.
+             */
+            enabled?: boolean;
+            [k: string]: unknown;
+          };
           [k: string]: unknown;
         };
         /**

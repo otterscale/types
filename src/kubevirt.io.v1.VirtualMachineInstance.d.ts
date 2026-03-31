@@ -683,8 +683,8 @@ export interface KubevirtIoV1VirtualMachineInstance {
          * most preferred is the one with the greatest sum of weights, i.e.
          * for each node that meets all of the scheduling requirements (resource
          * request, requiredDuringScheduling anti-affinity expressions, etc.),
-         * compute a sum by iterating through the elements of this field and adding
-         * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+         * compute a sum by iterating through the elements of this field and subtracting
+         * "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the
          * node(s) with the highest sum are the most preferred.
          */
         preferredDuringSchedulingIgnoredDuringExecution?: {
@@ -1627,6 +1627,12 @@ export interface KubevirtIoV1VirtualMachineInstance {
             [k: string]: unknown;
           };
           /**
+           * InterfacePasstBinding connects to a given network using passt usermode networking.
+           */
+          passtBinding?: {
+            [k: string]: unknown;
+          };
+          /**
            * If specified, the virtual network interface will be placed on the guests pci address with the specified PCI address. For example: 0000:81:01.10
            */
           pciAddress?: string;
@@ -1957,6 +1963,10 @@ export interface KubevirtIoV1VirtualMachineInstance {
               enabled?: boolean;
               [k: string]: unknown;
             };
+            /**
+             * Enabled determines if the feature should be enabled or disabled on the guest.
+             * Defaults to true.
+             */
             enabled?: boolean;
             [k: string]: unknown;
           };
@@ -1966,10 +1976,33 @@ export interface KubevirtIoV1VirtualMachineInstance {
            */
           tlbflush?: {
             /**
+             * Direct allows sending the TLB flush command directly to the hypervisor.
+             * It can be useful to optimize performance in nested virtualization cases, such as Windows VBS.
+             */
+            direct?: {
+              /**
+               * Enabled determines if the feature should be enabled or disabled on the guest.
+               * Defaults to true.
+               */
+              enabled?: boolean;
+              [k: string]: unknown;
+            };
+            /**
              * Enabled determines if the feature should be enabled or disabled on the guest.
              * Defaults to true.
              */
             enabled?: boolean;
+            /**
+             * Extended allows the guest to execute partial TLB flushes. It can be helpful for general purpose workloads.
+             */
+            extended?: {
+              /**
+               * Enabled determines if the feature should be enabled or disabled on the guest.
+               * Defaults to true.
+               */
+              enabled?: boolean;
+              [k: string]: unknown;
+            };
             [k: string]: unknown;
           };
           /**
@@ -2269,8 +2302,38 @@ export interface KubevirtIoV1VirtualMachineInstance {
          * The delta between MaxGuest and Guest is the amount of memory that can be hot(un)plugged.
          */
         maxGuest?: number | string;
+        /**
+         * ReservedOverhead configures the memory overhead applied to a VM
+         * and its characteristics.
+         */
+        reservedOverhead?: {
+          /**
+           * AddedOverhead determines the memory overhead that will be reserved
+           * for the VM. It increases the virt-launcher pod memory limit.
+           */
+          addedOverhead?: number | string;
+          /**
+           * RequiresLock determines whether the VM's and its overhead memory
+           * need to be locked or not. It is a common practice to enable this
+           * if vDPA, VFIO or any other specialized hardware that depends on
+           * DMA is being used by the VM.
+           * False - (Default) memory lock RLimits are not modified.
+           * True - Memory lock RLimits will be updated to consider VM memory
+           *        size and memory overhead
+           */
+          memLock?: 'NotRequired' | 'Required';
+          [k: string]: unknown;
+        };
         [k: string]: unknown;
       };
+      /**
+       * RebootPolicy specifies how the guest should behave on reboot.
+       * Reboot (default): The guest is allowed to reboot silently.
+       * Terminate: The VMI will be terminated on guest reboot, allowing
+       * higher level controllers (such as the VM controller) to recreate
+       * the VMI with any updated configuration such as boot order changes.
+       */
+      rebootPolicy?: 'Reboot' | 'Terminate';
       /**
        * Resources describes the Compute Resources required by this vmi.
        */
@@ -2866,6 +2929,35 @@ export interface KubevirtIoV1VirtualMachineInstance {
       [k: string]: unknown;
     }[];
     /**
+     * List of utility volumes that can be mounted to the vmi virt-launcher pod
+     * without having a matching disk in the domain.
+     * Used to collect data for various operational workflows.
+     *
+     * @maxItems 256
+     */
+    utilityVolumes?: {
+      /**
+       * claimName is the name of a PersistentVolumeClaim in the same namespace as the pod using this volume.
+       * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
+       */
+      claimName: string;
+      /**
+       * UtilityVolume's name.
+       * Must be unique within the vmi, including regular Volumes.
+       */
+      name: string;
+      /**
+       * readOnly Will force the ReadOnly setting in VolumeMounts.
+       * Default false.
+       */
+      readOnly?: boolean;
+      /**
+       * Type represents the type of the utility volume.
+       */
+      type?: string;
+      [k: string]: unknown;
+    }[];
+    /**
      * List of volumes that can be mounted by disks belonging to the vmi.
      *
      * @maxItems 256
@@ -3025,6 +3117,23 @@ export interface KubevirtIoV1VirtualMachineInstance {
          * Path defines the path to disk file in the container
          */
         path?: string;
+        [k: string]: unknown;
+      };
+      /**
+       * ContainerPath exposes a path from the virt-launcher container to the VM via virtiofs.
+       * The path must correspond to an existing volumeMount in the compute container.
+       */
+      containerPath?: {
+        /**
+         * Path is the absolute path within the virt-launcher container to expose to the VM.
+         * The path must correspond to an existing volumeMount in the compute container.
+         */
+        path: string;
+        /**
+         * ReadOnly controls whether the volume is exposed as read-only to the VM.
+         * Defaults to true. Write access is not currently supported.
+         */
+        readOnly?: boolean;
         [k: string]: unknown;
       };
       /**
@@ -3312,6 +3421,63 @@ export interface KubevirtIoV1VirtualMachineInstance {
      */
     changedBlockTracking?: {
       /**
+       * BackupStatus represents the status of vmi backup
+       */
+      backupStatus?: {
+        /**
+         * BackupMsg resturns any relevant information like failure reason
+         * unfreeze failed etc...
+         */
+        backupMsg?: string;
+        /**
+         * BackupName is the name of the executed backup
+         */
+        backupName?: string;
+        /**
+         * CheckpointName is the name of the checkpoint created for the backup
+         */
+        checkpointName?: string;
+        /**
+         * Completed indicates the backup completed
+         */
+        completed?: boolean;
+        /**
+         * EndTimestamp is the timestamp when the backup ended
+         */
+        endTimestamp?: string;
+        /**
+         * Failed indicates that the backup failed
+         */
+        failed?: boolean;
+        /**
+         * StartTimestamp is the timestamp when the backup started
+         */
+        startTimestamp?: string;
+        /**
+         * Volumes lists the volumes included in the backup
+         */
+        volumes?: {
+          /**
+           * DataEndpoint is the URL of the endpoint for read for pull mode
+           */
+          dataEndpoint?: string;
+          /**
+           * DiskTarget is the disk target device name at backup time
+           */
+          diskTarget: string;
+          /**
+           * MapEndpoint is the URL of the endpoint for map for pull mode
+           */
+          mapEndpoint?: string;
+          /**
+           * VolumeName is the volume name from VMI spec
+           */
+          volumeName: string;
+          [k: string]: unknown;
+        }[];
+        [k: string]: unknown;
+      };
+      /**
        * State represents the current CBT state
        */
       state: string;
@@ -3350,94 +3516,6 @@ export interface KubevirtIoV1VirtualMachineInstance {
        * Must be a value greater or equal 1.
        */
       threads?: number;
-      [k: string]: unknown;
-    };
-    /**
-     * DeviceStatus reflects the state of devices requested in spec.domain.devices. This is an optional field available
-     * only when DRA feature gate is enabled
-     * This field will only be populated if one of the feature-gates GPUsWithDRA or HostDevicesWithDRA is enabled.
-     * This feature is in alpha.
-     */
-    deviceStatus?: {
-      /**
-       * GPUStatuses reflects the state of GPUs requested in spec.domain.devices.gpus
-       */
-      gpuStatuses?: {
-        /**
-         * DeviceResourceClaimStatus reflects the DRA related information for the device
-         */
-        deviceResourceClaimStatus?: {
-          /**
-           * Attributes are properties of the device that could be used by kubevirt and other copmonents to learn more
-           * about the device, like pciAddress or mdevUUID
-           */
-          attributes?: {
-            /**
-             * MDevUUID is the mediated device uuid of the allocated device
-             */
-            mDevUUID?: string;
-            /**
-             * PCIAddress is the PCIe bus address of the allocated device
-             */
-            pciAddress?: string;
-            [k: string]: unknown;
-          };
-          /**
-           * Name is the name of actual device on the host provisioned by the driver as reflected in resourceclaim.status
-           */
-          name?: string;
-          /**
-           * ResourceClaimName is the name of the resource claims object used to provision this resource
-           */
-          resourceClaimName?: string;
-          [k: string]: unknown;
-        };
-        /**
-         * Name of the device as specified in spec.domain.devices.gpus.name or spec.domain.devices.hostDevices.name
-         */
-        name: string;
-        [k: string]: unknown;
-      }[];
-      /**
-       * HostDeviceStatuses reflects the state of GPUs requested in spec.domain.devices.hostDevices
-       * DRA
-       */
-      hostDeviceStatuses?: {
-        /**
-         * DeviceResourceClaimStatus reflects the DRA related information for the device
-         */
-        deviceResourceClaimStatus?: {
-          /**
-           * Attributes are properties of the device that could be used by kubevirt and other copmonents to learn more
-           * about the device, like pciAddress or mdevUUID
-           */
-          attributes?: {
-            /**
-             * MDevUUID is the mediated device uuid of the allocated device
-             */
-            mDevUUID?: string;
-            /**
-             * PCIAddress is the PCIe bus address of the allocated device
-             */
-            pciAddress?: string;
-            [k: string]: unknown;
-          };
-          /**
-           * Name is the name of actual device on the host provisioned by the driver as reflected in resourceclaim.status
-           */
-          name?: string;
-          /**
-           * ResourceClaimName is the name of the resource claims object used to provision this resource
-           */
-          resourceClaimName?: string;
-          [k: string]: unknown;
-        };
-        /**
-         * Name of the device as specified in spec.domain.devices.gpus.name or spec.domain.devices.hostDevices.name
-         */
-        name: string;
-        [k: string]: unknown;
-      }[];
       [k: string]: unknown;
     };
     /**
@@ -3589,6 +3667,11 @@ export interface KubevirtIoV1VirtualMachineInstance {
        * GuestRequested specifies how much memory was requested (hotplug) for the VirtualMachine.
        */
       guestRequested?: number | string;
+      /**
+       * MemoryOverhead specifies the memory overhead added by the virtualization infrastructure
+       * for the virt-launcher pod.
+       */
+      memoryOverhead?: number | string;
       [k: string]: unknown;
     };
     /**
@@ -3790,6 +3873,12 @@ export interface KubevirtIoV1VirtualMachineInstance {
          * indicates the migration will be unsafe to the guest. Defaults to false
          */
         unsafeMigrationOverride?: boolean;
+        /**
+         * UtilityVolumesTimeout is the maximum number of seconds a migration can wait in Pending state
+         * for utility volumes to be detached. If utility volumes are still present after this timeout,
+         * the migration will be marked as Failed. Defaults to 150
+         */
+        utilityVolumesTimeout?: number;
         [k: string]: unknown;
       };
       /**
@@ -3884,6 +3973,10 @@ export interface KubevirtIoV1VirtualMachineInstance {
       targetDirectMigrationNodePorts?: {
         [k: string]: number;
       };
+      /**
+       * TargetMemoryOverhead is the memory overhead of the target virt-launcher pod
+       */
+      targetMemoryOverhead?: number | string;
       /**
        * The target node that the VMI is moving to
        */

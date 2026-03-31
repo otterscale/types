@@ -374,15 +374,13 @@ export interface KubevirtIoV1Alpha3VirtualMachine {
            * volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim.
            * If specified, the CSI driver will create or update the volume with the attributes defined
            * in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName,
-           * it can be changed after the claim is created. An empty string value means that no VolumeAttributesClass
-           * will be applied to the claim but it's not allowed to reset this field to empty string once it is set.
-           * If unspecified and the PersistentVolumeClaim is unbound, the default VolumeAttributesClass
-           * will be set by the persistentvolume controller if it exists.
+           * it can be changed after the claim is created. An empty string or nil value indicates that no
+           * VolumeAttributesClass will be applied to the claim. If the claim enters an Infeasible error state,
+           * this field can be reset to its previous value (including nil) to cancel the modification.
            * If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be
            * set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
            * exists.
            * More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
-           * (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
            */
           volumeAttributesClassName?: string;
           /**
@@ -458,6 +456,10 @@ export interface KubevirtIoV1Alpha3VirtualMachine {
              * DiskID provides id of a disk to be imported
              */
             diskId: string;
+            /**
+             * InsecureSkipVerify is a flag to skip certificate verification
+             */
+            insecureSkipVerify?: boolean;
             /**
              * SecretRef provides the secret reference needed to access the ovirt-engine
              */
@@ -828,6 +830,12 @@ export interface KubevirtIoV1Alpha3VirtualMachine {
     /**
      * Running state indicates the requested running state of the VirtualMachineInstance
      * mutually exclusive with Running
+     * Following are allowed values:
+     * - "Always": VMI should always be running.
+     * - "Halted": VMI should never be running.
+     * - "Manual": VMI can be started/stopped using API endpoints.
+     * - "RerunOnFailure": VMI will initially be running and restarted if a failure occurs, but will not be restarted upon successful completion.
+     * - "Once": VMI will run once and not be restarted upon completion regardless if the completion is of phase Failure or Success.
      */
     runStrategy?: string;
     /**
@@ -1372,8 +1380,8 @@ export interface KubevirtIoV1Alpha3VirtualMachine {
              * most preferred is the one with the greatest sum of weights, i.e.
              * for each node that meets all of the scheduling requirements (resource
              * request, requiredDuringScheduling anti-affinity expressions, etc.),
-             * compute a sum by iterating through the elements of this field and adding
-             * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+             * compute a sum by iterating through the elements of this field and subtracting
+             * "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the
              * node(s) with the highest sum are the most preferred.
              */
             preferredDuringSchedulingIgnoredDuringExecution?: {
@@ -2316,6 +2324,12 @@ export interface KubevirtIoV1Alpha3VirtualMachine {
                 [k: string]: unknown;
               };
               /**
+               * InterfacePasstBinding connects to a given network using passt usermode networking.
+               */
+              passtBinding?: {
+                [k: string]: unknown;
+              };
+              /**
                * If specified, the virtual network interface will be placed on the guests pci address with the specified PCI address. For example: 0000:81:01.10
                */
               pciAddress?: string;
@@ -2646,6 +2660,10 @@ export interface KubevirtIoV1Alpha3VirtualMachine {
                   enabled?: boolean;
                   [k: string]: unknown;
                 };
+                /**
+                 * Enabled determines if the feature should be enabled or disabled on the guest.
+                 * Defaults to true.
+                 */
                 enabled?: boolean;
                 [k: string]: unknown;
               };
@@ -2655,10 +2673,33 @@ export interface KubevirtIoV1Alpha3VirtualMachine {
                */
               tlbflush?: {
                 /**
+                 * Direct allows sending the TLB flush command directly to the hypervisor.
+                 * It can be useful to optimize performance in nested virtualization cases, such as Windows VBS.
+                 */
+                direct?: {
+                  /**
+                   * Enabled determines if the feature should be enabled or disabled on the guest.
+                   * Defaults to true.
+                   */
+                  enabled?: boolean;
+                  [k: string]: unknown;
+                };
+                /**
                  * Enabled determines if the feature should be enabled or disabled on the guest.
                  * Defaults to true.
                  */
                 enabled?: boolean;
+                /**
+                 * Extended allows the guest to execute partial TLB flushes. It can be helpful for general purpose workloads.
+                 */
+                extended?: {
+                  /**
+                   * Enabled determines if the feature should be enabled or disabled on the guest.
+                   * Defaults to true.
+                   */
+                  enabled?: boolean;
+                  [k: string]: unknown;
+                };
                 [k: string]: unknown;
               };
               /**
@@ -2958,8 +2999,38 @@ export interface KubevirtIoV1Alpha3VirtualMachine {
              * The delta between MaxGuest and Guest is the amount of memory that can be hot(un)plugged.
              */
             maxGuest?: number | string;
+            /**
+             * ReservedOverhead configures the memory overhead applied to a VM
+             * and its characteristics.
+             */
+            reservedOverhead?: {
+              /**
+               * AddedOverhead determines the memory overhead that will be reserved
+               * for the VM. It increases the virt-launcher pod memory limit.
+               */
+              addedOverhead?: number | string;
+              /**
+               * RequiresLock determines whether the VM's and its overhead memory
+               * need to be locked or not. It is a common practice to enable this
+               * if vDPA, VFIO or any other specialized hardware that depends on
+               * DMA is being used by the VM.
+               * False - (Default) memory lock RLimits are not modified.
+               * True - Memory lock RLimits will be updated to consider VM memory
+               *        size and memory overhead
+               */
+              memLock?: 'NotRequired' | 'Required';
+              [k: string]: unknown;
+            };
             [k: string]: unknown;
           };
+          /**
+           * RebootPolicy specifies how the guest should behave on reboot.
+           * Reboot (default): The guest is allowed to reboot silently.
+           * Terminate: The VMI will be terminated on guest reboot, allowing
+           * higher level controllers (such as the VM controller) to recreate
+           * the VMI with any updated configuration such as boot order changes.
+           */
+          rebootPolicy?: 'Reboot' | 'Terminate';
           /**
            * Resources describes the Compute Resources required by this vmi.
            */
@@ -3555,6 +3626,35 @@ export interface KubevirtIoV1Alpha3VirtualMachine {
           [k: string]: unknown;
         }[];
         /**
+         * List of utility volumes that can be mounted to the vmi virt-launcher pod
+         * without having a matching disk in the domain.
+         * Used to collect data for various operational workflows.
+         *
+         * @maxItems 256
+         */
+        utilityVolumes?: {
+          /**
+           * claimName is the name of a PersistentVolumeClaim in the same namespace as the pod using this volume.
+           * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
+           */
+          claimName: string;
+          /**
+           * UtilityVolume's name.
+           * Must be unique within the vmi, including regular Volumes.
+           */
+          name: string;
+          /**
+           * readOnly Will force the ReadOnly setting in VolumeMounts.
+           * Default false.
+           */
+          readOnly?: boolean;
+          /**
+           * Type represents the type of the utility volume.
+           */
+          type?: string;
+          [k: string]: unknown;
+        }[];
+        /**
          * List of volumes that can be mounted by disks belonging to the vmi.
          *
          * @maxItems 256
@@ -3714,6 +3814,23 @@ export interface KubevirtIoV1Alpha3VirtualMachine {
              * Path defines the path to disk file in the container
              */
             path?: string;
+            [k: string]: unknown;
+          };
+          /**
+           * ContainerPath exposes a path from the virt-launcher container to the VM via virtiofs.
+           * The path must correspond to an existing volumeMount in the compute container.
+           */
+          containerPath?: {
+            /**
+             * Path is the absolute path within the virt-launcher container to expose to the VM.
+             * The path must correspond to an existing volumeMount in the compute container.
+             */
+            path: string;
+            /**
+             * ReadOnly controls whether the volume is exposed as read-only to the VM.
+             * Defaults to true. Write access is not currently supported.
+             */
+            readOnly?: boolean;
             [k: string]: unknown;
           };
           /**
@@ -3998,6 +4115,63 @@ export interface KubevirtIoV1Alpha3VirtualMachine {
      * ChangedBlockTracking represents the status of the changedBlockTracking
      */
     changedBlockTracking?: {
+      /**
+       * BackupStatus represents the status of vmi backup
+       */
+      backupStatus?: {
+        /**
+         * BackupMsg resturns any relevant information like failure reason
+         * unfreeze failed etc...
+         */
+        backupMsg?: string;
+        /**
+         * BackupName is the name of the executed backup
+         */
+        backupName?: string;
+        /**
+         * CheckpointName is the name of the checkpoint created for the backup
+         */
+        checkpointName?: string;
+        /**
+         * Completed indicates the backup completed
+         */
+        completed?: boolean;
+        /**
+         * EndTimestamp is the timestamp when the backup ended
+         */
+        endTimestamp?: string;
+        /**
+         * Failed indicates that the backup failed
+         */
+        failed?: boolean;
+        /**
+         * StartTimestamp is the timestamp when the backup started
+         */
+        startTimestamp?: string;
+        /**
+         * Volumes lists the volumes included in the backup
+         */
+        volumes?: {
+          /**
+           * DataEndpoint is the URL of the endpoint for read for pull mode
+           */
+          dataEndpoint?: string;
+          /**
+           * DiskTarget is the disk target device name at backup time
+           */
+          diskTarget: string;
+          /**
+           * MapEndpoint is the URL of the endpoint for map for pull mode
+           */
+          mapEndpoint?: string;
+          /**
+           * VolumeName is the volume name from VMI spec
+           */
+          volumeName: string;
+          [k: string]: unknown;
+        }[];
+        [k: string]: unknown;
+      };
       /**
        * State represents the current CBT state
        */

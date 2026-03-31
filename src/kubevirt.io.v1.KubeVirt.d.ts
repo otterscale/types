@@ -464,6 +464,11 @@ export interface KubevirtIoV1KubeVirt {
          */
         cpuAllocationRatio?: number;
         /**
+         * DisabledFeatureGates specifies a list of experimental feature gates to disable.
+         * A feature gate must not appear in both FeatureGates and DisabledFeatureGates.
+         */
+        disabledFeatureGates?: string[];
+        /**
          * DiskVerification holds container disks verification limits
          */
         diskVerification?: {
@@ -471,7 +476,8 @@ export interface KubevirtIoV1KubeVirt {
           [k: string]: unknown;
         };
         /**
-         * FeatureGates is the list of experimental features to enable. Defaults to none
+         * FeatureGates specifies a list of experimental feature gates to enable. Defaults to none.
+         * A feature gate must not appear in both FeatureGates and DisabledFeatureGates.
          */
         featureGates?: string[];
         /**
@@ -573,6 +579,19 @@ export interface KubevirtIoV1KubeVirt {
         [k: string]: unknown;
       };
       /**
+       * Hypervisors holds information regarding the hypervisor configurations supported on this cluster.
+       *
+       * @maxItems 1
+       */
+      hypervisors?: {
+        /**
+         * Name is the name of the hypervisor.
+         * Supported values are: "kvm", "hyperv-direct".
+         */
+        name?: 'kvm' | 'hyperv-direct';
+        [k: string]: unknown;
+      }[];
+      /**
        * PullPolicy describes a policy for if/when to pull a container image
        */
       imagePullPolicy?: string;
@@ -665,6 +684,12 @@ export interface KubevirtIoV1KubeVirt {
        * MediatedDevicesConfiguration holds information about MDEV types to be defined, if available
        */
       mediatedDevicesConfiguration?: {
+        /**
+         * Enable the creation and removal of mediated devices by virt-handler
+         * Replaces the deprecated DisableMDEVConfiguration feature gate
+         * Defaults to true
+         */
+        enabled?: boolean;
         mediatedDeviceTypes?: string[];
         /**
          * Deprecated. Use mediatedDeviceTypes instead.
@@ -768,8 +793,17 @@ export interface KubevirtIoV1KubeVirt {
          * indicates the migration will be unsafe to the guest. Defaults to false
          */
         unsafeMigrationOverride?: boolean;
+        /**
+         * UtilityVolumesTimeout is the maximum number of seconds a migration can wait in Pending state
+         * for utility volumes to be detached. If utility volumes are still present after this timeout,
+         * the migration will be marked as Failed. Defaults to 150
+         */
+        utilityVolumesTimeout?: number;
         [k: string]: unknown;
       };
+      /**
+       * deprecated
+       */
       minCPUModel?: string;
       /**
        * NetworkConfiguration holds network options
@@ -906,6 +940,15 @@ export interface KubevirtIoV1KubeVirt {
         [k: string]: unknown;
       };
       /**
+       * RoleAggregationStrategy controls whether RBAC cluster roles should be aggregated
+       * to the default Kubernetes roles (admin, edit, view).
+       * When set to "AggregateToDefault" (default) or not specified, the aggregate-to-* labels are added to the cluster roles.
+       * When set to "Manual", the labels are not added, and roles will not be aggregated to the default roles.
+       * Setting this field to "Manual" requires the OptOutRoleAggregation feature gate to be enabled.
+       * This is an Alpha feature and subject to change.
+       */
+      roleAggregationStrategy?: 'AggregateToDefault' | 'Manual';
+      /**
        * SeccompConfiguration holds Seccomp configuration for Kubevirt components
        */
       seccompConfiguration?: {
@@ -983,6 +1026,16 @@ export interface KubevirtIoV1KubeVirt {
          * vulnerabilities such as POODLE: https://en.wikipedia.org/wiki/POODLE
          */
         minTLSVersion?: 'VersionTLS10' | 'VersionTLS11' | 'VersionTLS12' | 'VersionTLS13';
+        [k: string]: unknown;
+      };
+      /**
+       * VirtTemplateDeployment controls the deployment of virt-template components
+       */
+      virtTemplateDeployment?: {
+        /**
+         * Enabled controls the deployment of virt-template resources, defaults to True when feature gate is enabled.
+         */
+        enabled?: boolean;
         [k: string]: unknown;
       };
       virtualMachineInstancesPerNode?: number;
@@ -1542,8 +1595,8 @@ export interface KubevirtIoV1KubeVirt {
              * most preferred is the one with the greatest sum of weights, i.e.
              * for each node that meets all of the scheduling requirements (resource
              * request, requiredDuringScheduling anti-affinity expressions, etc.),
-             * compute a sum by iterating through the elements of this field and adding
-             * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+             * compute a sum by iterating through the elements of this field and subtracting
+             * "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the
              * node(s) with the highest sum are the most preferred.
              */
             preferredDuringSchedulingIgnoredDuringExecution?: {
@@ -2371,8 +2424,8 @@ export interface KubevirtIoV1KubeVirt {
              * most preferred is the one with the greatest sum of weights, i.e.
              * for each node that meets all of the scheduling requirements (resource
              * request, requiredDuringScheduling anti-affinity expressions, etc.),
-             * compute a sum by iterating through the elements of this field and adding
-             * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+             * compute a sum by iterating through the elements of this field and subtracting
+             * "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the
              * node(s) with the highest sum are the most preferred.
              */
             preferredDuringSchedulingIgnoredDuringExecution?: {
