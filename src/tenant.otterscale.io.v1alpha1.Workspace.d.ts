@@ -370,6 +370,21 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
       [k: string]: unknown;
     }[];
     /**
+     * ConfigMapRef is a reference to the ConfigMap managed by this Workspace.
+     */
+    configMapRef?: {
+      /**
+       * Name is the name of the referenced resource.
+       */
+      name: string;
+      /**
+       * Namespace is the namespace of the referenced resource.
+       * Empty for cluster-scoped resources.
+       */
+      namespace?: string;
+      [k: string]: unknown;
+    };
+    /**
      * HelmRepositoryRef is a reference to the FluxCD HelmRepository for this workspace's Harbor OCI registry.
      */
     helmRepositoryRef?: {

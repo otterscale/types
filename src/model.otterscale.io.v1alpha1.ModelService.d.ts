@@ -181,6 +181,12 @@ export interface ModelOtterscaleIoV1Alpha1ModelService {
      */
     decode: {
       /**
+       * Annotations for the serving pods.
+       */
+      annotations?: {
+        [k: string]: string;
+      };
+      /**
        * NodeSelector constrains pods to nodes with matching labels.
        */
       nodeSelector?: {
@@ -637,6 +643,12 @@ export interface ModelOtterscaleIoV1Alpha1ModelService {
      * and Decode (token generation) phases on separate pod groups.
      */
     prefill?: {
+      /**
+       * Annotations for the serving pods.
+       */
+      annotations?: {
+        [k: string]: string;
+      };
       /**
        * NodeSelector constrains pods to nodes with matching labels.
        */
