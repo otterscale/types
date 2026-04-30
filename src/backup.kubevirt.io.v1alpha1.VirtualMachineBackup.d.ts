@@ -1,9 +1,9 @@
-/** Generated from Remote JSON Schema for cdi.kubevirt.io.v1beta1.StorageProfile */
+/** Generated from Remote JSON Schema for backup.kubevirt.io.v1alpha1.VirtualMachineBackup */
 
 /**
- * StorageProfile provides a CDI specific recommendation for storage parameters
+ * VirtualMachineBackup defines the operation of backing up a VM
  */
-export interface CdiKubevirtIoV1Beta1StorageProfile {
+export interface BackupKubevirtIoV1Alpha1VirtualMachineBackup {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -155,102 +155,115 @@ export interface CdiKubevirtIoV1Beta1StorageProfile {
     [k: string]: unknown;
   };
   /**
-   * StorageProfileSpec defines specification for StorageProfile
+   * VirtualMachineBackupSpec is the spec for a VirtualMachineBackup resource
    */
   spec: {
     /**
-     * ClaimPropertySets is a provided set of properties applicable to PVC
-     *
-     * @maxItems 8
+     * ForceFullBackup indicates that a full backup is desired
      */
-    claimPropertySets?: {
+    forceFullBackup?: boolean;
+    /**
+     * Mode specifies the way the backup output will be recieved
+     */
+    mode?: 'Push' | 'Pull';
+    /**
+     * PvcName required in push mode. Specifies the name of the PVC
+     * where the backup output will be stored
+     */
+    pvcName?: string;
+    /**
+     * SkipQuiesce indicates whether the VM's filesystem shoule not be quiesced before the backup
+     */
+    skipQuiesce?: boolean;
+    /**
+     * Source specifies the backup source - either a VirtualMachine or a VirtualMachineBackupTracker.
+     * When Kind is VirtualMachine: performs a backup of the specified VM.
+     * When Kind is VirtualMachineBackupTracker: uses the tracker to get the source VM
+     * and the base checkpoint for incremental backup. The tracker will be updated
+     * with the new checkpoint after backup completion.
+     */
+    source: {
       /**
-       * AccessModes contains the desired access modes the volume should have.
-       * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-       *
-       * @maxItems 4
+       * APIGroup is the group for the resource being referenced.
+       * If APIGroup is not specified, the specified Kind must be in the core API group.
+       * For any other third-party types, APIGroup is required.
        */
-      accessModes: string[];
+      apiGroup?: string;
       /**
-       * VolumeMode defines what type of volume is required by the claim.
-       * Value of Filesystem is implied when not included in claim spec.
+       * Kind is the type of resource being referenced
        */
-      volumeMode: 'Block' | 'Filesystem';
+      kind: string;
+      /**
+       * Name is the name of resource being referenced
+       */
+      name: string;
       [k: string]: unknown;
-    }[];
+    };
     /**
-     * CloneStrategy defines the preferred method for performing a CDI clone
+     * TokenSecretRef is the name of the secret that
+     * will be used to pull the backup from an associated endpoint
      */
-    cloneStrategy?: string;
+    tokenSecretRef?: string;
     /**
-     * DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources
+     * TtlDuration limits the lifetime of a pull mode backup and its export
+     * If this field is set, after this duration has passed from counting from CreationTimestamp,
+     * the backup is eligible to be automatically considered as complete.
+     * If this field is omitted, a reasonable default is applied.
      */
-    dataImportCronSourceFormat?: string;
-    /**
-     * SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.
-     */
-    snapshotClass?: string;
+    ttlDuration?: string;
     [k: string]: unknown;
   };
   /**
-   * StorageProfileStatus provides the most recently observed status of the StorageProfile
+   * VirtualMachineBackupStatus is the status for a VirtualMachineBackup resource
    */
   status?: {
     /**
-     * ClaimPropertySets computed from the spec and detected in the system
-     *
-     * @maxItems 8
+     * CheckpointName the name of the checkpoint created for the current backup
      */
-    claimPropertySets?: {
-      /**
-       * AccessModes contains the desired access modes the volume should have.
-       * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-       *
-       * @maxItems 4
-       */
-      accessModes: string[];
-      /**
-       * VolumeMode defines what type of volume is required by the claim.
-       * Value of Filesystem is implied when not included in claim spec.
-       */
-      volumeMode: 'Block' | 'Filesystem';
-      [k: string]: unknown;
-    }[];
-    /**
-     * CloneStrategy defines the preferred method for performing a CDI clone
-     */
-    cloneStrategy?: string;
-    /**
-     * Conditions contains the current conditions observed for the StorageProfile
-     */
+    checkpointName?: string;
     conditions?: {
-      lastHeartbeatTime?: string;
+      lastProbeTime?: string;
       lastTransitionTime?: string;
       message?: string;
       reason?: string;
       status: string;
       /**
-       * StorageProfileConditionType is the string representation of known condition types
+       * ConditionType is the const type for Conditions
        */
       type: string;
       [k: string]: unknown;
     }[];
     /**
-     * DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources
+     * EndpointCert is the raw CACert that is to be used when connecting
+     * to an exported backup endpoint in pull mode.
      */
-    dataImportCronSourceFormat?: string;
+    endpointCert?: string;
     /**
-     * The Storage class provisioner plugin name
+     * IncludedVolumes lists the volumes that were included in the backup
      */
-    provisioner?: string;
+    includedVolumes?: {
+      /**
+       * DataEndpoint is the URL of the endpoint for read for pull mode
+       */
+      dataEndpoint?: string;
+      /**
+       * DiskTarget is the disk target device name at backup time
+       */
+      diskTarget: string;
+      /**
+       * MapEndpoint is the URL of the endpoint for map for pull mode
+       */
+      mapEndpoint?: string;
+      /**
+       * VolumeName is the volume name from VMI spec
+       */
+      volumeName: string;
+      [k: string]: unknown;
+    }[];
     /**
-     * SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.
+     * Type indicates if the backup was full or incremental
      */
-    snapshotClass?: string;
-    /**
-     * The StorageClass name for which capabilities are defined
-     */
-    storageClass?: string;
+    type?: string;
     [k: string]: unknown;
   };
   [k: string]: unknown;

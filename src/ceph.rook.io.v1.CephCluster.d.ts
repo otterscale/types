@@ -385,7 +385,7 @@ export interface CephRookIoV1CephCluster {
       pgHealthCheckTimeout?: number;
       /**
        * PgHealthyRegex is the regular expression that is used to determine which PG states should be considered healthy.
-       * The default is `^(active\+clean|active\+clean\+scrubbing|active\+clean\+scrubbing\+deep)$`
+       * The default is `^active(\+(clean|deep|scrubbing|snaptrim|snaptrim_wait))+$`
        */
       pgHealthyRegex?: string;
       [k: string]: unknown;

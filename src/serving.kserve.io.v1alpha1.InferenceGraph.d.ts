@@ -1,9 +1,6 @@
-/** Generated from Remote JSON Schema for cdi.kubevirt.io.v1beta1.StorageProfile */
+/** Generated from Remote JSON Schema for serving.kserve.io.v1alpha1.InferenceGraph */
 
-/**
- * StorageProfile provides a CDI specific recommendation for storage parameters
- */
-export interface CdiKubevirtIoV1Beta1StorageProfile {
+export interface ServingKserveIoV1Alpha1InferenceGraph {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -154,103 +151,263 @@ export interface CdiKubevirtIoV1Beta1StorageProfile {
     uid?: string;
     [k: string]: unknown;
   };
-  /**
-   * StorageProfileSpec defines specification for StorageProfile
-   */
-  spec: {
-    /**
-     * ClaimPropertySets is a provided set of properties applicable to PVC
-     *
-     * @maxItems 8
-     */
-    claimPropertySets?: {
-      /**
-       * AccessModes contains the desired access modes the volume should have.
-       * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-       *
-       * @maxItems 4
-       */
-      accessModes: string[];
-      /**
-       * VolumeMode defines what type of volume is required by the claim.
-       * Value of Filesystem is implied when not included in claim spec.
-       */
-      volumeMode: 'Block' | 'Filesystem';
+  spec?: {
+    affinity?: {
+      nodeAffinity?: {
+        preferredDuringSchedulingIgnoredDuringExecution?: {
+          preference: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchFields?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            [k: string]: unknown;
+          };
+          weight: number;
+          [k: string]: unknown;
+        }[];
+        requiredDuringSchedulingIgnoredDuringExecution?: {
+          nodeSelectorTerms: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchFields?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            [k: string]: unknown;
+          }[];
+          [k: string]: unknown;
+        };
+        [k: string]: unknown;
+      };
+      podAffinity?: {
+        preferredDuringSchedulingIgnoredDuringExecution?: {
+          podAffinityTerm: {
+            labelSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            matchLabelKeys?: string[];
+            mismatchLabelKeys?: string[];
+            namespaceSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            namespaces?: string[];
+            topologyKey: string;
+            [k: string]: unknown;
+          };
+          weight: number;
+          [k: string]: unknown;
+        }[];
+        requiredDuringSchedulingIgnoredDuringExecution?: {
+          labelSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          matchLabelKeys?: string[];
+          mismatchLabelKeys?: string[];
+          namespaceSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          namespaces?: string[];
+          topologyKey: string;
+          [k: string]: unknown;
+        }[];
+        [k: string]: unknown;
+      };
+      podAntiAffinity?: {
+        preferredDuringSchedulingIgnoredDuringExecution?: {
+          podAffinityTerm: {
+            labelSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            matchLabelKeys?: string[];
+            mismatchLabelKeys?: string[];
+            namespaceSelector?: {
+              matchExpressions?: {
+                key: string;
+                operator: string;
+                values?: string[];
+                [k: string]: unknown;
+              }[];
+              matchLabels?: {
+                [k: string]: string;
+              };
+              [k: string]: unknown;
+            };
+            namespaces?: string[];
+            topologyKey: string;
+            [k: string]: unknown;
+          };
+          weight: number;
+          [k: string]: unknown;
+        }[];
+        requiredDuringSchedulingIgnoredDuringExecution?: {
+          labelSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          matchLabelKeys?: string[];
+          mismatchLabelKeys?: string[];
+          namespaceSelector?: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchLabels?: {
+              [k: string]: string;
+            };
+            [k: string]: unknown;
+          };
+          namespaces?: string[];
+          topologyKey: string;
+          [k: string]: unknown;
+        }[];
+        [k: string]: unknown;
+      };
+      [k: string]: unknown;
+    };
+    maxReplicas?: number;
+    minReplicas?: number;
+    nodeName?: string;
+    nodeSelector?: {
+      [k: string]: string;
+    };
+    nodes: {
+      [k: string]: {
+        routerType: 'Sequence' | 'Splitter' | 'Ensemble' | 'Switch';
+        steps?: {
+          condition?: string;
+          data?: string;
+          dependency?: 'Soft' | 'Hard';
+          mapPredictionsToInstances?: boolean;
+          name?: string;
+          nodeName?: string;
+          serviceName?: string;
+          serviceUrl?: string;
+          weight?: number;
+          [k: string]: unknown;
+        }[];
+        [k: string]: unknown;
+      };
+    };
+    resources?: {
+      claims?: {
+        name: string;
+        request?: string;
+        [k: string]: unknown;
+      }[];
+      limits?: {
+        [k: string]: number | string;
+      };
+      requests?: {
+        [k: string]: number | string;
+      };
+      [k: string]: unknown;
+    };
+    routerTimeouts?: {
+      serverIdle?: number;
+      serverRead?: number;
+      serverWrite?: number;
+      serviceClient?: number;
+      [k: string]: unknown;
+    };
+    scaleMetric?: 'cpu' | 'memory' | 'concurrency' | 'rps';
+    scaleTarget?: number;
+    serviceAccountName?: string;
+    timeout?: number;
+    tolerations?: {
+      effect?: string;
+      key?: string;
+      operator?: string;
+      tolerationSeconds?: number;
+      value?: string;
       [k: string]: unknown;
     }[];
-    /**
-     * CloneStrategy defines the preferred method for performing a CDI clone
-     */
-    cloneStrategy?: string;
-    /**
-     * DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources
-     */
-    dataImportCronSourceFormat?: string;
-    /**
-     * SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.
-     */
-    snapshotClass?: string;
     [k: string]: unknown;
   };
-  /**
-   * StorageProfileStatus provides the most recently observed status of the StorageProfile
-   */
   status?: {
-    /**
-     * ClaimPropertySets computed from the spec and detected in the system
-     *
-     * @maxItems 8
-     */
-    claimPropertySets?: {
-      /**
-       * AccessModes contains the desired access modes the volume should have.
-       * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-       *
-       * @maxItems 4
-       */
-      accessModes: string[];
-      /**
-       * VolumeMode defines what type of volume is required by the claim.
-       * Value of Filesystem is implied when not included in claim spec.
-       */
-      volumeMode: 'Block' | 'Filesystem';
-      [k: string]: unknown;
-    }[];
-    /**
-     * CloneStrategy defines the preferred method for performing a CDI clone
-     */
-    cloneStrategy?: string;
-    /**
-     * Conditions contains the current conditions observed for the StorageProfile
-     */
+    annotations?: {
+      [k: string]: string;
+    };
     conditions?: {
-      lastHeartbeatTime?: string;
       lastTransitionTime?: string;
       message?: string;
       reason?: string;
+      severity?: string;
       status: string;
-      /**
-       * StorageProfileConditionType is the string representation of known condition types
-       */
       type: string;
       [k: string]: unknown;
     }[];
-    /**
-     * DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources
-     */
-    dataImportCronSourceFormat?: string;
-    /**
-     * The Storage class provisioner plugin name
-     */
-    provisioner?: string;
-    /**
-     * SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.
-     */
-    snapshotClass?: string;
-    /**
-     * The StorageClass name for which capabilities are defined
-     */
-    storageClass?: string;
+    deploymentMode?: string;
+    observedGeneration?: number;
+    url?: string;
     [k: string]: unknown;
   };
   [k: string]: unknown;

@@ -1,11 +1,10 @@
-/** Generated from Remote JSON Schema for fleet.otterscale.io.v1alpha1.Cluster */
+/** Generated from Remote JSON Schema for backup.kubevirt.io.v1alpha1.VirtualMachineBackupTracker */
 
 /**
- * Cluster is the Schema for the clusters API.
- * A Cluster represents a Talos Linux Kubernetes cluster provisioned on bare metal
- * via Metal3 BareMetalHost resources.
+ * VirtualMachineBackupTracker defines the way to track the latest checkpoint of
+ * a backup solution for a vm
  */
-export interface FleetOtterscaleIoV1Alpha1Cluster {
+export interface BackupKubevirtIoV1Alpha1VirtualMachineBackupTracker {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -157,259 +156,69 @@ export interface FleetOtterscaleIoV1Alpha1Cluster {
     [k: string]: unknown;
   };
   /**
-   * Spec defines the desired behavior of the Cluster.
+   * VirtualMachineBackupTrackerSpec is the spec for a VirtualMachineBackupTracker resource
    */
   spec: {
     /**
-     * ClusterNetwork configures pod, service, and DNS networking.
+     * Source specifies the VM that this backupTracker is associated with
      */
-    clusterNetwork?: {
+    source: {
       /**
-       * DNSDomain is the DNS domain used for internal cluster DNS (default: cluster.local).
+       * APIGroup is the group for the resource being referenced.
+       * If APIGroup is not specified, the specified Kind must be in the core API group.
+       * For any other third-party types, APIGroup is required.
        */
-      dnsDomain?: string;
+      apiGroup?: string;
       /**
-       * PodSubnets is the list of CIDR ranges for pod IP allocation.
-       *
-       * @minItems 1
-       * @maxItems 4
+       * Kind is the type of resource being referenced
        */
-      podSubnets?: string[];
+      kind: string;
       /**
-       * ServiceSubnets is the list of CIDR ranges for service ClusterIP allocation.
-       *
-       * @minItems 1
-       * @maxItems 4
+       * Name is the name of resource being referenced
        */
-      serviceSubnets?: string[];
-      [k: string]: unknown;
-    };
-    /**
-     * ControlPlaneConfig defines how Talos machine configs are produced for control plane nodes.
-     * Individual Machines may override this via their own TalosConfig field.
-     */
-    controlPlaneConfig?: {
-      /**
-       * ConfigPatches is a list of RFC 6902 JSON patches applied to the generated config.
-       * Ignored when GenerateType is "none".
-       */
-      configPatches?: {
-        /**
-         * Op is the patch operation (add, remove, replace, move, copy, test).
-         */
-        op: 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test';
-        /**
-         * Path is the JSON pointer to the target location.
-         */
-        path: string;
-        /**
-         * Value is the value to use in the patch operation (required for add/replace/test).
-         */
-        value?: {
-          [k: string]: unknown;
-        };
-        [k: string]: unknown;
-      }[];
-      /**
-       * Data is the raw Talos machine configuration YAML.
-       * Required when GenerateType is "none"; ignored otherwise.
-       */
-      data?: string;
-      /**
-       * GenerateType determines how the Talos machine config is produced.
-       * "controlplane" auto-generates a control plane config from cluster parameters.
-       * "worker" auto-generates a worker (join) config from cluster parameters.
-       * "none" expects the user to supply a complete config in the Data field.
-       * When omitted, the controller defaults based on the Machine role.
-       */
-      generateType?: 'controlplane' | 'worker' | 'none';
-      [k: string]: unknown;
-    };
-    /**
-     * ControlPlaneEndpoint is the API server endpoint (typically a VIP or load balancer).
-     */
-    controlPlaneEndpoint: {
-      /**
-       * Host is the hostname or IP address of the API server.
-       */
-      host: string;
-      /**
-       * Port is the port number of the API server.
-       */
-      port?: number;
-      [k: string]: unknown;
-    };
-    /**
-     * KubernetesVersion is the target Kubernetes version (e.g., "v1.32.0").
-     */
-    kubernetesVersion: string;
-    /**
-     * TalosImage specifies the Talos OS image written to each BareMetalHost.
-     */
-    talosImage: {
-      /**
-       * Checksum is the image checksum or a URL pointing to a checksum file.
-       */
-      checksum: string;
-      /**
-       * ChecksumType is the algorithm used for the checksum (sha256, sha512, md5, or auto).
-       */
-      checksumType?: 'sha256' | 'sha512' | 'md5' | 'auto';
-      /**
-       * Format is the disk image format (raw, qcow2, or live-iso).
-       */
-      format?: 'raw' | 'qcow2' | 'live-iso';
-      /**
-       * URL is the location of the OS image (e.g., HTTP server hosting Talos raw image).
-       */
-      url: string;
-      [k: string]: unknown;
-    };
-    /**
-     * TalosVersion is the Talos OS version to use for config generation (e.g., "v1.9").
-     */
-    talosVersion: string;
-    /**
-     * WorkerConfig defines how Talos machine configs are produced for worker nodes.
-     * When omitted, defaults to generateType "worker" which auto-generates a join config.
-     * Individual Machines may override this via their own TalosConfig field.
-     */
-    workerConfig?: {
-      /**
-       * ConfigPatches is a list of RFC 6902 JSON patches applied to the generated config.
-       * Ignored when GenerateType is "none".
-       */
-      configPatches?: {
-        /**
-         * Op is the patch operation (add, remove, replace, move, copy, test).
-         */
-        op: 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test';
-        /**
-         * Path is the JSON pointer to the target location.
-         */
-        path: string;
-        /**
-         * Value is the value to use in the patch operation (required for add/replace/test).
-         */
-        value?: {
-          [k: string]: unknown;
-        };
-        [k: string]: unknown;
-      }[];
-      /**
-       * Data is the raw Talos machine configuration YAML.
-       * Required when GenerateType is "none"; ignored otherwise.
-       */
-      data?: string;
-      /**
-       * GenerateType determines how the Talos machine config is produced.
-       * "controlplane" auto-generates a control plane config from cluster parameters.
-       * "worker" auto-generates a worker (join) config from cluster parameters.
-       * "none" expects the user to supply a complete config in the Data field.
-       * When omitted, the controller defaults based on the Machine role.
-       */
-      generateType?: 'controlplane' | 'worker' | 'none';
+      name: string;
       [k: string]: unknown;
     };
     [k: string]: unknown;
   };
-  /**
-   * Status represents the current information about the Cluster.
-   */
   status?: {
     /**
-     * Conditions store the status conditions of the Cluster.
+     * CheckpointRedefinitionRequired is set to true by virt-handler when the VM
+     * restarts and has a checkpoint that needs to be redefined in libvirt.
+     * virt-controller will process this flag, attempt redefinition, and clear it.
      */
-    conditions?: {
-      /**
-       * lastTransitionTime is the last time the condition transitioned from one status to another.
-       * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
-       */
-      lastTransitionTime: string;
-      /**
-       * message is a human readable message indicating details about the transition.
-       * This may be an empty string.
-       */
-      message: string;
-      /**
-       * observedGeneration represents the .metadata.generation that the condition was set based upon.
-       * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
-       * with respect to the current state of the instance.
-       */
-      observedGeneration?: number;
-      /**
-       * reason contains a programmatic identifier indicating the reason for the condition's last transition.
-       * Producers of specific condition types may define expected values and meanings for this field,
-       * and whether the values are considered a guaranteed API.
-       * The value should be a CamelCase string.
-       * This field may not be empty.
-       */
-      reason: string;
-      /**
-       * status of the condition, one of True, False, Unknown.
-       */
-      status: 'True' | 'False' | 'Unknown';
-      /**
-       * type of condition in CamelCase or in foo.example.com/CamelCase.
-       */
-      type: string;
-      [k: string]: unknown;
-    }[];
+    checkpointRedefinitionRequired?: boolean;
     /**
-     * ControlPlaneReady is true when all control plane Machines are bootstrapped and running.
+     * LatestCheckpoint is the metadata of the checkpoint of
+     * the latest performed backup
      */
-    controlPlaneReady?: boolean;
-    /**
-     * Initialized is true once the first control plane node has been bootstrapped
-     * and etcd has been initialized.
-     */
-    initialized?: boolean;
-    /**
-     * ObservedGeneration is the most recent generation observed by the controller.
-     */
-    observedGeneration?: number;
-    /**
-     * Phase is the high-level summary of the cluster lifecycle.
-     */
-    phase?: 'Pending' | 'Provisioning' | 'Provisioned' | 'Ready' | 'Failed' | 'Deleting';
-    /**
-     * ReadyWorkers is the count of worker Machines that are ready.
-     */
-    readyWorkers?: number;
-    /**
-     * SecretsRef references the Secret containing the Talos secrets bundle.
-     */
-    secretsRef?: {
+    latestCheckpoint?: {
+      creationTime?: string;
+      name?: string;
       /**
-       * Name is the name of the referenced resource.
+       * Volumes lists volumes and their disk targets at backup time
        */
-      name: string;
-      /**
-       * Namespace is the namespace of the referenced resource.
-       * Empty for cluster-scoped resources.
-       */
-      namespace?: string;
+      volumes?: {
+        /**
+         * DataEndpoint is the URL of the endpoint for read for pull mode
+         */
+        dataEndpoint?: string;
+        /**
+         * DiskTarget is the disk target device name at backup time
+         */
+        diskTarget: string;
+        /**
+         * MapEndpoint is the URL of the endpoint for map for pull mode
+         */
+        mapEndpoint?: string;
+        /**
+         * VolumeName is the volume name from VMI spec
+         */
+        volumeName: string;
+        [k: string]: unknown;
+      }[];
       [k: string]: unknown;
     };
-    /**
-     * TalosconfigRef references the Secret containing the talosconfig client configuration.
-     */
-    talosconfigRef?: {
-      /**
-       * Name is the name of the referenced resource.
-       */
-      name: string;
-      /**
-       * Namespace is the namespace of the referenced resource.
-       * Empty for cluster-scoped resources.
-       */
-      namespace?: string;
-      [k: string]: unknown;
-    };
-    /**
-     * TotalWorkers is the total count of worker Machines.
-     */
-    totalWorkers?: number;
     [k: string]: unknown;
   };
   [k: string]: unknown;

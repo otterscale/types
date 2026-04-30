@@ -1,11 +1,6 @@
-/** Generated from Remote JSON Schema for fleet.otterscale.io.v1alpha1.Machine */
+/** Generated from Remote JSON Schema for serving.kserve.io.v1alpha1.TrainedModel */
 
-/**
- * Machine is the Schema for the machines API.
- * A Machine represents a single bare metal node in a Talos cluster,
- * backed by a Metal3 BareMetalHost.
- */
-export interface FleetOtterscaleIoV1Alpha1Machine {
+export interface ServingKserveIoV1Alpha1TrainedModel {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -156,173 +151,38 @@ export interface FleetOtterscaleIoV1Alpha1Machine {
     uid?: string;
     [k: string]: unknown;
   };
-  /**
-   * Spec defines the desired behavior of the Machine.
-   */
-  spec: {
-    /**
-     * BareMetalHostRef references the Metal3 BareMetalHost that backs this Machine.
-     */
-    bareMetalHostRef: {
-      /**
-       * Name is the name of the BareMetalHost.
-       */
-      name: string;
-      /**
-       * Namespace is the namespace of the BareMetalHost.
-       */
-      namespace: string;
-      [k: string]: unknown;
-    };
-    /**
-     * Bootstrap indicates whether this Machine is the initial bootstrap node
-     * responsible for initializing etcd. Exactly one control plane Machine per
-     * Cluster should have this set to true. Must not be set on worker Machines.
-     */
-    bootstrap?: boolean;
-    /**
-     * ClusterRef is the name of the Cluster this Machine belongs to.
-     */
-    clusterRef: string;
-    /**
-     * Role defines whether this Machine is a control plane or worker node.
-     */
-    role: 'controlplane' | 'worker';
-    /**
-     * TalosConfig overrides the Cluster-level default config for this Machine.
-     * When omitted, the fallback is role-aware: control plane Machines use
-     * the Cluster's ControlPlaneConfig, worker Machines use the Cluster's WorkerConfig.
-     */
-    talosConfig?: {
-      /**
-       * ConfigPatches is a list of RFC 6902 JSON patches applied to the generated config.
-       * Ignored when GenerateType is "none".
-       */
-      configPatches?: {
-        /**
-         * Op is the patch operation (add, remove, replace, move, copy, test).
-         */
-        op: 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test';
-        /**
-         * Path is the JSON pointer to the target location.
-         */
-        path: string;
-        /**
-         * Value is the value to use in the patch operation (required for add/replace/test).
-         */
-        value?: {
-          [k: string]: unknown;
-        };
-        [k: string]: unknown;
-      }[];
-      /**
-       * Data is the raw Talos machine configuration YAML.
-       * Required when GenerateType is "none"; ignored otherwise.
-       */
-      data?: string;
-      /**
-       * GenerateType determines how the Talos machine config is produced.
-       * "controlplane" auto-generates a control plane config from cluster parameters.
-       * "worker" auto-generates a worker (join) config from cluster parameters.
-       * "none" expects the user to supply a complete config in the Data field.
-       * When omitted, the controller defaults based on the Machine role.
-       */
-      generateType?: 'controlplane' | 'worker' | 'none';
+  spec?: {
+    inferenceService: string;
+    model: {
+      framework: string;
+      memory: number | string;
+      storageUri: string;
       [k: string]: unknown;
     };
     [k: string]: unknown;
   };
-  /**
-   * Status represents the current information about the Machine.
-   */
   status?: {
-    /**
-     * Addresses contains the addresses reported by the BareMetalHost hardware inspection.
-     */
-    addresses?: {
-      /**
-       * Address is the actual address value.
-       */
-      address: string;
-      /**
-       * Type is the type of the address (InternalIP, ExternalIP, Hostname).
-       */
-      type: string;
-      [k: string]: unknown;
-    }[];
-    /**
-     * BootstrapDataSecretRef references the Secret containing the Talos machine config.
-     */
-    bootstrapDataSecretRef?: {
-      /**
-       * Name is the name of the referenced resource.
-       */
-      name: string;
-      /**
-       * Namespace is the namespace of the referenced resource.
-       * Empty for cluster-scoped resources.
-       */
-      namespace?: string;
+    address?: {
+      CACerts?: string;
+      audience?: string;
+      name?: string;
+      url?: string;
       [k: string]: unknown;
     };
-    /**
-     * BootstrapReady is true when the Talos bootstrap has completed.
-     */
-    bootstrapReady?: boolean;
-    /**
-     * Conditions store the status conditions of the Machine.
-     */
+    annotations?: {
+      [k: string]: string;
+    };
     conditions?: {
-      /**
-       * lastTransitionTime is the last time the condition transitioned from one status to another.
-       * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
-       */
-      lastTransitionTime: string;
-      /**
-       * message is a human readable message indicating details about the transition.
-       * This may be an empty string.
-       */
-      message: string;
-      /**
-       * observedGeneration represents the .metadata.generation that the condition was set based upon.
-       * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
-       * with respect to the current state of the instance.
-       */
-      observedGeneration?: number;
-      /**
-       * reason contains a programmatic identifier indicating the reason for the condition's last transition.
-       * Producers of specific condition types may define expected values and meanings for this field,
-       * and whether the values are considered a guaranteed API.
-       * The value should be a CamelCase string.
-       * This field may not be empty.
-       */
-      reason: string;
-      /**
-       * status of the condition, one of True, False, Unknown.
-       */
-      status: 'True' | 'False' | 'Unknown';
-      /**
-       * type of condition in CamelCase or in foo.example.com/CamelCase.
-       */
+      lastTransitionTime?: string;
+      message?: string;
+      reason?: string;
+      severity?: string;
+      status: string;
       type: string;
       [k: string]: unknown;
     }[];
-    /**
-     * InfrastructureReady is true when the BareMetalHost has finished provisioning.
-     */
-    infrastructureReady?: boolean;
-    /**
-     * ObservedGeneration is the most recent generation observed by the controller.
-     */
     observedGeneration?: number;
-    /**
-     * Phase is the high-level summary of the machine lifecycle.
-     */
-    phase?: 'Pending' | 'Provisioning' | 'Provisioned' | 'Bootstrapping' | 'Running' | 'Failed' | 'Deleting';
-    /**
-     * Ready is true when the Machine is fully bootstrapped and the node is healthy.
-     */
-    ready?: boolean;
+    url?: string;
     [k: string]: unknown;
   };
   [k: string]: unknown;

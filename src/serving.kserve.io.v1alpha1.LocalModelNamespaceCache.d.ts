@@ -1,13 +1,6 @@
-/** Generated from Remote JSON Schema for model.otterscale.io.v1alpha1.ModelArtifact */
+/** Generated from Remote JSON Schema for serving.kserve.io.v1alpha1.LocalModelNamespaceCache */
 
-/**
- * ModelArtifact is the Schema for the model artifacts API.
- * A ModelArtifact declares intent to import a model from a source (e.g. HuggingFace),
- * package it as an OCI artifact (ModelPack or ModelKit format), and push it to an
- * OCI-compliant registry. The controller creates a Kubernetes Job to execute the
- * import/pack/push pipeline and reports the resulting digest back to the status.
- */
-export interface ModelOtterscaleIoV1Alpha1ModelArtifact {
+export interface ServingKserveIoV1Alpha1LocalModelNamespaceCache {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -158,191 +151,44 @@ export interface ModelOtterscaleIoV1Alpha1ModelArtifact {
     uid?: string;
     [k: string]: unknown;
   };
-  /**
-   * Spec defines the desired artifact.
-   */
-  spec: {
+  spec?: {
+    modelSize: number | string;
     /**
-     * Format specifies the OCI artifact packaging format.
+     * @minItems 1
      */
-    format?: 'ModelPack' | 'ModelKit';
-    /**
-     * Source defines where to fetch the model from.
-     */
-    source: {
-      /**
-       * HuggingFace specifies a HuggingFace Hub repository as the model source.
-       */
-      huggingFace?: {
-        /**
-         * Model is the HuggingFace model identifier (e.g. "microsoft/phi-4", "facebook/opt-125m").
-         * Must contain only alphanumerics, dots, underscores, hyphens, and slashes.
-         */
-        model: string;
-        /**
-         * Revision pins a specific branch, tag, or commit hash.
-         * If not specified, the default branch is used.
-         * Must contain only alphanumerics, dots, underscores, hyphens, and slashes.
-         */
-        revision?: string;
-        /**
-         * TokenSecretRef references a Secret containing the HuggingFace access token.
-         * Required for private or gated repositories.
-         */
-        tokenSecretRef?: {
-          /**
-           * Key is the key within the Secret data. If omitted, defaults to "token".
-           */
-          key?: string;
-          /**
-           * Name is the name of the Secret in the same namespace as the ModelArtifact.
-           */
-          name: string;
-          [k: string]: unknown;
-        };
-        [k: string]: unknown;
+    nodeGroups: string[];
+    serviceAccountName?: string;
+    sourceModelUri: string;
+    storage?: {
+      key?: string;
+      parameters?: {
+        [k: string]: string;
       };
-      [k: string]: unknown;
-    };
-    /**
-     * Storage configures the temporary PVC used during the import/pack/push pipeline.
-     * The PVC is automatically cleaned up after the job completes.
-     */
-    storage: {
-      /**
-       * Size is the requested PVC storage capacity (e.g. "100Gi").
-       * Should be at least 2x the expected model size to accommodate both
-       * the downloaded files and the packed artifact.
-       */
-      size: number | string;
-      /**
-       * StorageClassName overrides the cluster default StorageClass.
-       * If not specified, the cluster default StorageClass is used.
-       */
-      storageClassName?: string;
-      [k: string]: unknown;
-    };
-    /**
-     * Target defines the OCI registry destination for the packaged artifact.
-     */
-    target: {
-      /**
-       * CredentialsSecretRef references a Secret of type kubernetes.io/dockerconfigjson
-       * containing OCI registry credentials. The Secret is mounted into the Job Pod
-       * at /.docker/config.json so that kit push authenticates automatically.
-       */
-      credentialsSecretRef?: {
-        /**
-         * Name is the name of the Secret in the same namespace as the ModelArtifact.
-         */
-        name: string;
-        [k: string]: unknown;
-      };
-      /**
-       * Insecure uses an unencrypted connection to the registry instead of TLS.
-       * Only use for development or air-gapped environments.
-       */
-      insecure?: boolean;
-      /**
-       * Registry is the OCI registry host, optionally with port (e.g. "ghcr.io", "registry.local:5001").
-       * Must not contain slashes — the path component belongs in Repository.
-       */
-      registry: string;
-      /**
-       * Repository is the OCI repository path within the registry (e.g. "myorg/models/phi-4", "facebook/opt-125m").
-       * Must not include the registry host. Must contain only alphanumerics, dots, underscores, hyphens, and slashes.
-       */
-      repository: string;
-      /**
-       * Tag is the image tag to push. Defaults to "latest" if not specified.
-       * Must contain only alphanumerics, dots, underscores, and hyphens.
-       */
-      tag?: string;
       [k: string]: unknown;
     };
     [k: string]: unknown;
   };
-  /**
-   * Status represents the current state of the artifact pipeline.
-   */
   status?: {
-    /**
-     * CompletionTime is the timestamp when the most recent job completed (succeeded or failed).
-     */
-    completionTime?: string;
-    /**
-     * Conditions store the status conditions of the ModelArtifact.
-     */
-    conditions?: {
-      /**
-       * lastTransitionTime is the last time the condition transitioned from one status to another.
-       * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
-       */
-      lastTransitionTime: string;
-      /**
-       * message is a human readable message indicating details about the transition.
-       * This may be an empty string.
-       */
-      message: string;
-      /**
-       * observedGeneration represents the .metadata.generation that the condition was set based upon.
-       * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
-       * with respect to the current state of the instance.
-       */
-      observedGeneration?: number;
-      /**
-       * reason contains a programmatic identifier indicating the reason for the condition's last transition.
-       * Producers of specific condition types may define expected values and meanings for this field,
-       * and whether the values are considered a guaranteed API.
-       * The value should be a CamelCase string.
-       * This field may not be empty.
-       */
-      reason: string;
-      /**
-       * status of the condition, one of True, False, Unknown.
-       */
-      status: 'True' | 'False' | 'Unknown';
-      /**
-       * type of condition in CamelCase or in foo.example.com/CamelCase.
-       */
-      type: string;
-      [k: string]: unknown;
-    }[];
-    /**
-     * Digest is the OCI manifest digest of the pushed artifact (e.g. "sha256:abc123...").
-     * Only populated when Phase is Succeeded.
-     */
-    digest?: string;
-    /**
-     * JobRef references the most recently created Job for this artifact.
-     */
-    jobRef?: {
-      /**
-       * Name is the name of the referenced resource.
-       */
-      name: string;
-      /**
-       * Namespace is the namespace of the referenced resource.
-       */
-      namespace?: string;
+    copies?: {
+      available?: number;
+      failed?: number;
+      total?: number;
       [k: string]: unknown;
     };
-    /**
-     * ObservedGeneration is the most recent generation observed by the controller.
-     */
-    observedGeneration?: number;
-    /**
-     * Phase is the high-level summary of the artifact lifecycle.
-     */
-    phase?: string;
-    /**
-     * Reference is the full OCI reference of the pushed artifact including tag.
-     */
-    reference?: string;
-    /**
-     * StartTime is the timestamp when the most recent job was created.
-     */
-    startTime?: string;
+    inferenceServices?: {
+      name?: string;
+      namespace?: string;
+      [k: string]: unknown;
+    }[];
+    nodeStatus?: {
+      [k: string]:
+        | ''
+        | 'NodeNotReady'
+        | 'NodeDownloadPending'
+        | 'NodeDownloading'
+        | 'NodeDownloaded'
+        | 'NodeDownloadError';
+    };
     [k: string]: unknown;
   };
   [k: string]: unknown;

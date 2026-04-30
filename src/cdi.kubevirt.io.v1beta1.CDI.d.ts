@@ -258,9 +258,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
          * This field is effectively required, but due to backwards compatibility is
          * allowed to be empty. Instances of this type with an empty value here are
          * almost certainly wrong.
-         * TODO: Add other useful fields. apiVersion, kind, uid?
          * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-         * TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
          */
         name?: string;
         [k: string]: unknown;
@@ -285,7 +283,6 @@ export interface CdiKubevirtIoV1Beta1CDI {
          * TrustedCAProxy is the name of a ConfigMap in the cdi namespace that contains a user-provided trusted certificate authority (CA) bundle.
          * The TrustedCAProxy ConfigMap is consumed by the DataImportCron controller for creating cronjobs, and by the import controller referring a copy of the ConfigMap in the import namespace.
          * Here is an example of the ConfigMap (in yaml):
-         *
          *
          * apiVersion: v1
          * kind: ConfigMap
@@ -317,10 +314,8 @@ export interface CdiKubevirtIoV1Beta1CDI {
          * Claims lists the names of resources, defined in spec.resourceClaims,
          * that are used by this container.
          *
-         *
          * This is an alpha field and requires enabling the
          * DynamicResourceAllocation feature gate.
-         *
          *
          * This field is immutable. It can only be set for containers.
          */
@@ -331,6 +326,12 @@ export interface CdiKubevirtIoV1Beta1CDI {
            * inside a container.
            */
           name: string;
+          /**
+           * Request is the name chosen for a request in the referenced claim.
+           * If empty, everything from the claim is made available, otherwise
+           * only the result of this request.
+           */
+          request?: string;
           [k: string]: unknown;
         }[];
         /**
@@ -368,7 +369,6 @@ export interface CdiKubevirtIoV1Beta1CDI {
          * profile as invalid configurations can be catastrophic. An example custom profile
          * looks like this:
          *
-         *
          *   ciphers:
          *     - ECDHE-ECDSA-CHACHA20-POLY1305
          *     - ECDHE-RSA-CHACHA20-POLY1305
@@ -382,7 +382,6 @@ export interface CdiKubevirtIoV1Beta1CDI {
            * during the TLS handshake.  Operators may remove entries their operands
            * do not support.  For example, to use DES-CBC3-SHA  (yaml):
            *
-           *
            *   ciphers:
            *     - DES-CBC3-SHA
            */
@@ -392,9 +391,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
            * that is negotiated during the TLS handshake. For example, to use TLS
            * versions 1.1, 1.2 and 1.3 (yaml):
            *
-           *
            *   minTLSVersion: VersionTLS11
-           *
            *
            * NOTE: currently the highest minTLSVersion allowed is VersionTLS12
            */
@@ -404,12 +401,9 @@ export interface CdiKubevirtIoV1Beta1CDI {
         /**
          * intermediate is a TLS security profile based on:
          *
-         *
          * https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29
          *
-         *
          * and looks like this (yaml):
-         *
          *
          *   ciphers:
          *     - TLS_AES_128_GCM_SHA256
@@ -431,19 +425,15 @@ export interface CdiKubevirtIoV1Beta1CDI {
         /**
          * modern is a TLS security profile based on:
          *
-         *
          * https://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility
          *
-         *
          * and looks like this (yaml):
-         *
          *
          *   ciphers:
          *     - TLS_AES_128_GCM_SHA256
          *     - TLS_AES_256_GCM_SHA384
          *     - TLS_CHACHA20_POLY1305_SHA256
          *   minTLSVersion: VersionTLS13
-         *
          *
          * NOTE: Currently unsupported.
          */
@@ -453,12 +443,9 @@ export interface CdiKubevirtIoV1Beta1CDI {
         /**
          * old is a TLS security profile based on:
          *
-         *
          * https://wiki.mozilla.org/Security/Server_Side_TLS#Old_backward_compatibility
          *
-         *
          * and looks like this (yaml):
-         *
          *
          *   ciphers:
          *     - TLS_AES_128_GCM_SHA256
@@ -500,14 +487,11 @@ export interface CdiKubevirtIoV1Beta1CDI {
          * the ability to specify individual TLS security profile parameters.
          * Old, Intermediate and Modern are TLS security profiles based on:
          *
-         *
          * https://wiki.mozilla.org/Security/Server_Side_TLS#Recommended_configurations
-         *
          *
          * The profiles are intent based, so they may change over time as new ciphers are developed and existing ciphers
          * are found to be insecure.  Depending on precisely which ciphers are available to a process, the list may be
          * reduced.
-         *
          *
          * Note that the Modern profile is currently not supported because it is not
          * yet well adopted by common software libraries.
@@ -771,7 +755,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
                * pod labels will be ignored. The default value is empty.
                * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                * Also, matchLabelKeys cannot be set when labelSelector isn't set.
-               * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+               * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                */
               matchLabelKeys?: string[];
               /**
@@ -783,7 +767,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
                * pod labels will be ignored. The default value is empty.
                * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-               * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+               * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                */
               mismatchLabelKeys?: string[];
               /**
@@ -906,7 +890,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
              * pod labels will be ignored. The default value is empty.
              * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
-             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
              */
             matchLabelKeys?: string[];
             /**
@@ -918,7 +902,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
              * pod labels will be ignored. The default value is empty.
              * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
              */
             mismatchLabelKeys?: string[];
             /**
@@ -1046,7 +1030,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
                * pod labels will be ignored. The default value is empty.
                * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                * Also, matchLabelKeys cannot be set when labelSelector isn't set.
-               * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+               * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                */
               matchLabelKeys?: string[];
               /**
@@ -1058,7 +1042,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
                * pod labels will be ignored. The default value is empty.
                * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-               * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+               * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                */
               mismatchLabelKeys?: string[];
               /**
@@ -1181,7 +1165,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
              * pod labels will be ignored. The default value is empty.
              * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
-             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
              */
             matchLabelKeys?: string[];
             /**
@@ -1193,7 +1177,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
              * pod labels will be ignored. The default value is empty.
              * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
              */
             mismatchLabelKeys?: string[];
             /**
@@ -1541,7 +1525,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
                * pod labels will be ignored. The default value is empty.
                * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                * Also, matchLabelKeys cannot be set when labelSelector isn't set.
-               * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+               * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                */
               matchLabelKeys?: string[];
               /**
@@ -1553,7 +1537,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
                * pod labels will be ignored. The default value is empty.
                * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-               * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+               * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                */
               mismatchLabelKeys?: string[];
               /**
@@ -1676,7 +1660,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
              * pod labels will be ignored. The default value is empty.
              * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
-             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
              */
             matchLabelKeys?: string[];
             /**
@@ -1688,7 +1672,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
              * pod labels will be ignored. The default value is empty.
              * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
              */
             mismatchLabelKeys?: string[];
             /**
@@ -1816,7 +1800,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
                * pod labels will be ignored. The default value is empty.
                * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                * Also, matchLabelKeys cannot be set when labelSelector isn't set.
-               * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+               * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                */
               matchLabelKeys?: string[];
               /**
@@ -1828,7 +1812,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
                * pod labels will be ignored. The default value is empty.
                * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-               * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+               * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                */
               mismatchLabelKeys?: string[];
               /**
@@ -1951,7 +1935,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
              * pod labels will be ignored. The default value is empty.
              * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
-             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
              */
             matchLabelKeys?: string[];
             /**
@@ -1963,7 +1947,7 @@ export interface CdiKubevirtIoV1Beta1CDI {
              * pod labels will be ignored. The default value is empty.
              * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             * This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
              */
             mismatchLabelKeys?: string[];
             /**

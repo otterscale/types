@@ -3,7 +3,6 @@
 /**
  * Deprecated for removal in v1.
  *
- *
  * ObjectTransfer is the cluster scoped object transfer resource
  */
 export interface CdiKubevirtIoV1Beta1ObjectTransfer {
