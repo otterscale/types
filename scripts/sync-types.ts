@@ -78,6 +78,7 @@ const INCLUDE_GROUPS = new Set([
   "source.toolkit.fluxcd.io",
   "storage.k8s.io",
   "tenant.otterscale.io",
+  "leaderworkerset.x-k8s.io",
 ]);
 
 const transport = createConnectTransport({
