@@ -165,6 +165,11 @@ export interface CephRookIoV1CephFilesystemSubVolumeGroup {
      */
     clusterID?: string;
     /**
+     * The RADOS namespace ceph-csi uses for additional metadata it stores in the metadata pool of the CephFS.
+     * If not specified the default of the ceph-csi driver is used.
+     */
+    csiMetadataRadosNamespace?: string;
+    /**
      * The data pool name for the Ceph Filesystem subvolume group layout, if the default CephFS pool is not desired.
      */
     dataPoolName?: string;

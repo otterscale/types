@@ -1,9 +1,6 @@
-/** Generated from Remote JSON Schema for cdi.kubevirt.io.v1beta1.StorageProfile */
+/** Generated from Remote JSON Schema for objectbucket.io.v1alpha1.ObjectBucketClaim */
 
-/**
- * StorageProfile provides a CDI specific recommendation for storage parameters
- */
-export interface CdiKubevirtIoV1Beta1StorageProfile {
+export interface ObjectbucketIoV1Alpha1ObjectBucketClaim {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -154,103 +151,17 @@ export interface CdiKubevirtIoV1Beta1StorageProfile {
     uid?: string;
     [k: string]: unknown;
   };
-  /**
-   * StorageProfileSpec defines specification for StorageProfile
-   */
-  spec: {
-    /**
-     * ClaimPropertySets is a provided set of properties applicable to PVC
-     *
-     * @maxItems 8
-     */
-    claimPropertySets?: {
-      /**
-       * AccessModes contains the desired access modes the volume should have.
-       * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-       *
-       * @maxItems 4
-       */
-      accessModes: string[];
-      /**
-       * VolumeMode defines what type of volume is required by the claim.
-       * Value of Filesystem is implied when not included in claim spec.
-       */
-      volumeMode: 'Block' | 'Filesystem';
+  spec?: {
+    additionalConfig?: {
       [k: string]: unknown;
-    }[];
-    /**
-     * CloneStrategy defines the preferred method for performing a CDI clone
-     */
-    cloneStrategy?: string;
-    /**
-     * DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources
-     */
-    dataImportCronSourceFormat?: string;
-    /**
-     * SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.
-     */
-    snapshotClass?: string;
+    };
+    bucketName?: string;
+    generateBucketName?: string;
+    objectBucketName?: string;
+    storageClassName?: string;
     [k: string]: unknown;
   };
-  /**
-   * StorageProfileStatus provides the most recently observed status of the StorageProfile
-   */
   status?: {
-    /**
-     * ClaimPropertySets computed from the spec and detected in the system
-     *
-     * @maxItems 8
-     */
-    claimPropertySets?: {
-      /**
-       * AccessModes contains the desired access modes the volume should have.
-       * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-       *
-       * @maxItems 4
-       */
-      accessModes: string[];
-      /**
-       * VolumeMode defines what type of volume is required by the claim.
-       * Value of Filesystem is implied when not included in claim spec.
-       */
-      volumeMode: 'Block' | 'Filesystem';
-      [k: string]: unknown;
-    }[];
-    /**
-     * CloneStrategy defines the preferred method for performing a CDI clone
-     */
-    cloneStrategy?: string;
-    /**
-     * Conditions contains the current conditions observed for the StorageProfile
-     */
-    conditions?: {
-      lastHeartbeatTime?: string;
-      lastTransitionTime?: string;
-      message?: string;
-      reason?: string;
-      status: string;
-      /**
-       * StorageProfileConditionType is the string representation of known condition types
-       */
-      type: string;
-      [k: string]: unknown;
-    }[];
-    /**
-     * DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources
-     */
-    dataImportCronSourceFormat?: string;
-    /**
-     * The Storage class provisioner plugin name
-     */
-    provisioner?: string;
-    /**
-     * SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.
-     */
-    snapshotClass?: string;
-    /**
-     * The StorageClass name for which capabilities are defined
-     */
-    storageClass?: string;
     [k: string]: unknown;
   };
   [k: string]: unknown;

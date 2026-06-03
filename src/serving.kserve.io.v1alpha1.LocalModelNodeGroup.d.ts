@@ -1,9 +1,6 @@
-/** Generated from Remote JSON Schema for cdi.kubevirt.io.v1beta1.StorageProfile */
+/** Generated from Remote JSON Schema for serving.kserve.io.v1alpha1.LocalModelNodeGroup */
 
-/**
- * StorageProfile provides a CDI specific recommendation for storage parameters
- */
-export interface CdiKubevirtIoV1Beta1StorageProfile {
+export interface ServingKserveIoV1Alpha1LocalModelNodeGroup {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -154,103 +151,331 @@ export interface CdiKubevirtIoV1Beta1StorageProfile {
     uid?: string;
     [k: string]: unknown;
   };
-  /**
-   * StorageProfileSpec defines specification for StorageProfile
-   */
-  spec: {
-    /**
-     * ClaimPropertySets is a provided set of properties applicable to PVC
-     *
-     * @maxItems 8
-     */
-    claimPropertySets?: {
-      /**
-       * AccessModes contains the desired access modes the volume should have.
-       * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-       *
-       * @maxItems 4
-       */
-      accessModes: string[];
-      /**
-       * VolumeMode defines what type of volume is required by the claim.
-       * Value of Filesystem is implied when not included in claim spec.
-       */
-      volumeMode: 'Block' | 'Filesystem';
+  spec?: {
+    persistentVolumeClaimSpec: {
+      accessModes?: string[];
+      dataSource?: {
+        apiGroup?: string;
+        kind: string;
+        name: string;
+        [k: string]: unknown;
+      };
+      dataSourceRef?: {
+        apiGroup?: string;
+        kind: string;
+        name: string;
+        namespace?: string;
+        [k: string]: unknown;
+      };
+      resources?: {
+        limits?: {
+          [k: string]: number | string;
+        };
+        requests?: {
+          [k: string]: number | string;
+        };
+        [k: string]: unknown;
+      };
+      selector?: {
+        matchExpressions?: {
+          key: string;
+          operator: string;
+          values?: string[];
+          [k: string]: unknown;
+        }[];
+        matchLabels?: {
+          [k: string]: string;
+        };
+        [k: string]: unknown;
+      };
+      storageClassName?: string;
+      volumeAttributesClassName?: string;
+      volumeMode?: string;
+      volumeName?: string;
       [k: string]: unknown;
-    }[];
-    /**
-     * CloneStrategy defines the preferred method for performing a CDI clone
-     */
-    cloneStrategy?: string;
-    /**
-     * DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources
-     */
-    dataImportCronSourceFormat?: string;
-    /**
-     * SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.
-     */
-    snapshotClass?: string;
+    };
+    persistentVolumeSpec: {
+      accessModes?: string[];
+      awsElasticBlockStore?: {
+        fsType?: string;
+        partition?: number;
+        readOnly?: boolean;
+        volumeID: string;
+        [k: string]: unknown;
+      };
+      azureDisk?: {
+        cachingMode?: string;
+        diskName: string;
+        diskURI: string;
+        fsType?: string;
+        kind?: string;
+        readOnly?: boolean;
+        [k: string]: unknown;
+      };
+      azureFile?: {
+        readOnly?: boolean;
+        secretName: string;
+        secretNamespace?: string;
+        shareName: string;
+        [k: string]: unknown;
+      };
+      capacity?: {
+        [k: string]: number | string;
+      };
+      cephfs?: {
+        monitors: string[];
+        path?: string;
+        readOnly?: boolean;
+        secretFile?: string;
+        secretRef?: {
+          name?: string;
+          namespace?: string;
+          [k: string]: unknown;
+        };
+        user?: string;
+        [k: string]: unknown;
+      };
+      cinder?: {
+        fsType?: string;
+        readOnly?: boolean;
+        secretRef?: {
+          name?: string;
+          namespace?: string;
+          [k: string]: unknown;
+        };
+        volumeID: string;
+        [k: string]: unknown;
+      };
+      claimRef?: {
+        apiVersion?: string;
+        fieldPath?: string;
+        kind?: string;
+        name?: string;
+        namespace?: string;
+        resourceVersion?: string;
+        uid?: string;
+        [k: string]: unknown;
+      };
+      csi?: {
+        controllerExpandSecretRef?: {
+          name?: string;
+          namespace?: string;
+          [k: string]: unknown;
+        };
+        controllerPublishSecretRef?: {
+          name?: string;
+          namespace?: string;
+          [k: string]: unknown;
+        };
+        driver: string;
+        fsType?: string;
+        nodeExpandSecretRef?: {
+          name?: string;
+          namespace?: string;
+          [k: string]: unknown;
+        };
+        nodePublishSecretRef?: {
+          name?: string;
+          namespace?: string;
+          [k: string]: unknown;
+        };
+        nodeStageSecretRef?: {
+          name?: string;
+          namespace?: string;
+          [k: string]: unknown;
+        };
+        readOnly?: boolean;
+        volumeAttributes?: {
+          [k: string]: string;
+        };
+        volumeHandle: string;
+        [k: string]: unknown;
+      };
+      fc?: {
+        fsType?: string;
+        lun?: number;
+        readOnly?: boolean;
+        targetWWNs?: string[];
+        wwids?: string[];
+        [k: string]: unknown;
+      };
+      flexVolume?: {
+        driver: string;
+        fsType?: string;
+        options?: {
+          [k: string]: string;
+        };
+        readOnly?: boolean;
+        secretRef?: {
+          name?: string;
+          namespace?: string;
+          [k: string]: unknown;
+        };
+        [k: string]: unknown;
+      };
+      flocker?: {
+        datasetName?: string;
+        datasetUUID?: string;
+        [k: string]: unknown;
+      };
+      gcePersistentDisk?: {
+        fsType?: string;
+        partition?: number;
+        pdName: string;
+        readOnly?: boolean;
+        [k: string]: unknown;
+      };
+      glusterfs?: {
+        endpoints: string;
+        endpointsNamespace?: string;
+        path: string;
+        readOnly?: boolean;
+        [k: string]: unknown;
+      };
+      hostPath?: {
+        path: string;
+        type?: string;
+        [k: string]: unknown;
+      };
+      iscsi?: {
+        chapAuthDiscovery?: boolean;
+        chapAuthSession?: boolean;
+        fsType?: string;
+        initiatorName?: string;
+        iqn: string;
+        iscsiInterface?: string;
+        lun: number;
+        portals?: string[];
+        readOnly?: boolean;
+        secretRef?: {
+          name?: string;
+          namespace?: string;
+          [k: string]: unknown;
+        };
+        targetPortal: string;
+        [k: string]: unknown;
+      };
+      local?: {
+        fsType?: string;
+        path: string;
+        [k: string]: unknown;
+      };
+      mountOptions?: string[];
+      nfs?: {
+        path: string;
+        readOnly?: boolean;
+        server: string;
+        [k: string]: unknown;
+      };
+      nodeAffinity?: {
+        required?: {
+          nodeSelectorTerms: {
+            matchExpressions?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            matchFields?: {
+              key: string;
+              operator: string;
+              values?: string[];
+              [k: string]: unknown;
+            }[];
+            [k: string]: unknown;
+          }[];
+          [k: string]: unknown;
+        };
+        [k: string]: unknown;
+      };
+      persistentVolumeReclaimPolicy?: string;
+      photonPersistentDisk?: {
+        fsType?: string;
+        pdID: string;
+        [k: string]: unknown;
+      };
+      portworxVolume?: {
+        fsType?: string;
+        readOnly?: boolean;
+        volumeID: string;
+        [k: string]: unknown;
+      };
+      quobyte?: {
+        group?: string;
+        readOnly?: boolean;
+        registry: string;
+        tenant?: string;
+        user?: string;
+        volume: string;
+        [k: string]: unknown;
+      };
+      rbd?: {
+        fsType?: string;
+        image: string;
+        keyring?: string;
+        monitors: string[];
+        pool?: string;
+        readOnly?: boolean;
+        secretRef?: {
+          name?: string;
+          namespace?: string;
+          [k: string]: unknown;
+        };
+        user?: string;
+        [k: string]: unknown;
+      };
+      scaleIO?: {
+        fsType?: string;
+        gateway: string;
+        protectionDomain?: string;
+        readOnly?: boolean;
+        secretRef: {
+          name?: string;
+          namespace?: string;
+          [k: string]: unknown;
+        };
+        sslEnabled?: boolean;
+        storageMode?: string;
+        storagePool?: string;
+        system: string;
+        volumeName?: string;
+        [k: string]: unknown;
+      };
+      storageClassName?: string;
+      storageos?: {
+        fsType?: string;
+        readOnly?: boolean;
+        secretRef?: {
+          apiVersion?: string;
+          fieldPath?: string;
+          kind?: string;
+          name?: string;
+          namespace?: string;
+          resourceVersion?: string;
+          uid?: string;
+          [k: string]: unknown;
+        };
+        volumeName?: string;
+        volumeNamespace?: string;
+        [k: string]: unknown;
+      };
+      volumeAttributesClassName?: string;
+      volumeMode?: string;
+      vsphereVolume?: {
+        fsType?: string;
+        storagePolicyID?: string;
+        storagePolicyName?: string;
+        volumePath: string;
+        [k: string]: unknown;
+      };
+      [k: string]: unknown;
+    };
+    storageLimit: number | string;
     [k: string]: unknown;
   };
-  /**
-   * StorageProfileStatus provides the most recently observed status of the StorageProfile
-   */
   status?: {
-    /**
-     * ClaimPropertySets computed from the spec and detected in the system
-     *
-     * @maxItems 8
-     */
-    claimPropertySets?: {
-      /**
-       * AccessModes contains the desired access modes the volume should have.
-       * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-       *
-       * @maxItems 4
-       */
-      accessModes: string[];
-      /**
-       * VolumeMode defines what type of volume is required by the claim.
-       * Value of Filesystem is implied when not included in claim spec.
-       */
-      volumeMode: 'Block' | 'Filesystem';
-      [k: string]: unknown;
-    }[];
-    /**
-     * CloneStrategy defines the preferred method for performing a CDI clone
-     */
-    cloneStrategy?: string;
-    /**
-     * Conditions contains the current conditions observed for the StorageProfile
-     */
-    conditions?: {
-      lastHeartbeatTime?: string;
-      lastTransitionTime?: string;
-      message?: string;
-      reason?: string;
-      status: string;
-      /**
-       * StorageProfileConditionType is the string representation of known condition types
-       */
-      type: string;
-      [k: string]: unknown;
-    }[];
-    /**
-     * DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources
-     */
-    dataImportCronSourceFormat?: string;
-    /**
-     * The Storage class provisioner plugin name
-     */
-    provisioner?: string;
-    /**
-     * SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.
-     */
-    snapshotClass?: string;
-    /**
-     * The StorageClass name for which capabilities are defined
-     */
-    storageClass?: string;
+    available?: number | string;
+    used?: number | string;
     [k: string]: unknown;
   };
   [k: string]: unknown;

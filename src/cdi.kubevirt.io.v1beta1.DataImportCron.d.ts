@@ -403,7 +403,7 @@ export interface CdiKubevirtIoV1Beta1DataImportCron {
            * set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
            * exists.
            * More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
-           * (Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.
+           * (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
            */
           volumeAttributesClassName?: string;
           /**
@@ -417,6 +417,10 @@ export interface CdiKubevirtIoV1Beta1DataImportCron {
           volumeName?: string;
           [k: string]: unknown;
         };
+        /**
+         * ServiceAccountName for Importer and Uploader pod
+         */
+        serviceAccountName?: string;
         /**
          * Source is the src of the data for the requested DataVolume
          */
@@ -449,6 +453,12 @@ export interface CdiKubevirtIoV1Beta1DataImportCron {
              * CertConfigMap is a configmap reference, containing a Certificate Authority(CA) public key, and a base64 encoded pem certificate
              */
             certConfigMap?: string;
+            /**
+             * Checksum is the expected checksum of the file. Format: "algorithm:hash", e.g., "sha256:1234abcd..." or "md5:5678efgh..."
+             * Supported algorithms: md5, sha1, sha256, sha512
+             * If specified, the importer will verify the downloaded content matches this checksum
+             */
+            checksum?: string;
             /**
              * ExtraHeaders is a list of strings containing extra headers to include with HTTP transfer requests
              */

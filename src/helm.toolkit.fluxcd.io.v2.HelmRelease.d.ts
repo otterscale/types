@@ -793,7 +793,10 @@ export interface HelmToolkitFluxcdIoV2HelmRelease {
        */
       disableWaitForJobs?: boolean;
       /**
-       * Force forces resource updates through a replacement strategy.
+       * Force forces resource updates through a replacement strategy
+       * that avoids 3-way merge conflicts on client-side apply.
+       * This field is ignored for server-side apply (which always
+       * forces conflicts with other field managers).
        */
       force?: boolean;
       /**
@@ -972,7 +975,10 @@ export interface HelmToolkitFluxcdIoV2HelmRelease {
        */
       disableWaitForJobs?: boolean;
       /**
-       * Force forces resource updates through a replacement strategy.
+       * Force forces resource updates through a replacement strategy
+       * that avoids 3-way merge conflicts on client-side apply.
+       * This field is ignored for server-side apply (which always
+       * forces conflicts with other field managers).
        */
       force?: boolean;
       /**

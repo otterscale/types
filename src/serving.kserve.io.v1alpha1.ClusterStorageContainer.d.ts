@@ -1,13 +1,11 @@
-/** Generated from Remote JSON Schema for cdi.kubevirt.io.v1beta1.StorageProfile */
+/** Generated from Remote JSON Schema for serving.kserve.io.v1alpha1.ClusterStorageContainer */
 
-/**
- * StorageProfile provides a CDI specific recommendation for storage parameters
- */
-export interface CdiKubevirtIoV1Beta1StorageProfile {
+export interface ServingKserveIoV1Alpha1ClusterStorageContainer {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
   apiVersion?: string;
+  disabled?: boolean;
   /**
    * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
    */
@@ -154,103 +152,336 @@ export interface CdiKubevirtIoV1Beta1StorageProfile {
     uid?: string;
     [k: string]: unknown;
   };
-  /**
-   * StorageProfileSpec defines specification for StorageProfile
-   */
-  spec: {
-    /**
-     * ClaimPropertySets is a provided set of properties applicable to PVC
-     *
-     * @maxItems 8
-     */
-    claimPropertySets?: {
-      /**
-       * AccessModes contains the desired access modes the volume should have.
-       * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-       *
-       * @maxItems 4
-       */
-      accessModes: string[];
-      /**
-       * VolumeMode defines what type of volume is required by the claim.
-       * Value of Filesystem is implied when not included in claim spec.
-       */
-      volumeMode: 'Block' | 'Filesystem';
+  spec?: {
+    container: {
+      args?: string[];
+      command?: string[];
+      env?: {
+        name: string;
+        value?: string;
+        valueFrom?: {
+          configMapKeyRef?: {
+            key: string;
+            name?: string;
+            optional?: boolean;
+            [k: string]: unknown;
+          };
+          fieldRef?: {
+            apiVersion?: string;
+            fieldPath: string;
+            [k: string]: unknown;
+          };
+          fileKeyRef?: {
+            key: string;
+            optional?: boolean;
+            path: string;
+            volumeName: string;
+            [k: string]: unknown;
+          };
+          resourceFieldRef?: {
+            containerName?: string;
+            divisor?: number | string;
+            resource: string;
+            [k: string]: unknown;
+          };
+          secretKeyRef?: {
+            key: string;
+            name?: string;
+            optional?: boolean;
+            [k: string]: unknown;
+          };
+          [k: string]: unknown;
+        };
+        [k: string]: unknown;
+      }[];
+      envFrom?: {
+        configMapRef?: {
+          name?: string;
+          optional?: boolean;
+          [k: string]: unknown;
+        };
+        prefix?: string;
+        secretRef?: {
+          name?: string;
+          optional?: boolean;
+          [k: string]: unknown;
+        };
+        [k: string]: unknown;
+      }[];
+      image?: string;
+      imagePullPolicy?: string;
+      lifecycle?: {
+        postStart?: {
+          exec?: {
+            command?: string[];
+            [k: string]: unknown;
+          };
+          httpGet?: {
+            host?: string;
+            httpHeaders?: {
+              name: string;
+              value: string;
+              [k: string]: unknown;
+            }[];
+            path?: string;
+            port: number | string;
+            scheme?: string;
+            [k: string]: unknown;
+          };
+          sleep?: {
+            seconds: number;
+            [k: string]: unknown;
+          };
+          tcpSocket?: {
+            host?: string;
+            port: number | string;
+            [k: string]: unknown;
+          };
+          [k: string]: unknown;
+        };
+        preStop?: {
+          exec?: {
+            command?: string[];
+            [k: string]: unknown;
+          };
+          httpGet?: {
+            host?: string;
+            httpHeaders?: {
+              name: string;
+              value: string;
+              [k: string]: unknown;
+            }[];
+            path?: string;
+            port: number | string;
+            scheme?: string;
+            [k: string]: unknown;
+          };
+          sleep?: {
+            seconds: number;
+            [k: string]: unknown;
+          };
+          tcpSocket?: {
+            host?: string;
+            port: number | string;
+            [k: string]: unknown;
+          };
+          [k: string]: unknown;
+        };
+        stopSignal?: string;
+        [k: string]: unknown;
+      };
+      livenessProbe?: {
+        exec?: {
+          command?: string[];
+          [k: string]: unknown;
+        };
+        failureThreshold?: number;
+        grpc?: {
+          port: number;
+          service?: string;
+          [k: string]: unknown;
+        };
+        httpGet?: {
+          host?: string;
+          httpHeaders?: {
+            name: string;
+            value: string;
+            [k: string]: unknown;
+          }[];
+          path?: string;
+          port: number | string;
+          scheme?: string;
+          [k: string]: unknown;
+        };
+        initialDelaySeconds?: number;
+        periodSeconds?: number;
+        successThreshold?: number;
+        tcpSocket?: {
+          host?: string;
+          port: number | string;
+          [k: string]: unknown;
+        };
+        terminationGracePeriodSeconds?: number;
+        timeoutSeconds?: number;
+        [k: string]: unknown;
+      };
+      name: string;
+      ports?: {
+        containerPort: number;
+        hostIP?: string;
+        hostPort?: number;
+        name?: string;
+        protocol?: string;
+        [k: string]: unknown;
+      }[];
+      readinessProbe?: {
+        exec?: {
+          command?: string[];
+          [k: string]: unknown;
+        };
+        failureThreshold?: number;
+        grpc?: {
+          port: number;
+          service?: string;
+          [k: string]: unknown;
+        };
+        httpGet?: {
+          host?: string;
+          httpHeaders?: {
+            name: string;
+            value: string;
+            [k: string]: unknown;
+          }[];
+          path?: string;
+          port: number | string;
+          scheme?: string;
+          [k: string]: unknown;
+        };
+        initialDelaySeconds?: number;
+        periodSeconds?: number;
+        successThreshold?: number;
+        tcpSocket?: {
+          host?: string;
+          port: number | string;
+          [k: string]: unknown;
+        };
+        terminationGracePeriodSeconds?: number;
+        timeoutSeconds?: number;
+        [k: string]: unknown;
+      };
+      resizePolicy?: {
+        resourceName: string;
+        restartPolicy: string;
+        [k: string]: unknown;
+      }[];
+      resources?: {
+        claims?: {
+          name: string;
+          request?: string;
+          [k: string]: unknown;
+        }[];
+        limits?: {
+          [k: string]: number | string;
+        };
+        requests?: {
+          [k: string]: number | string;
+        };
+        [k: string]: unknown;
+      };
+      restartPolicy?: string;
+      restartPolicyRules?: {
+        action: string;
+        exitCodes?: {
+          operator: string;
+          values?: number[];
+          [k: string]: unknown;
+        };
+        [k: string]: unknown;
+      }[];
+      securityContext?: {
+        allowPrivilegeEscalation?: boolean;
+        appArmorProfile?: {
+          localhostProfile?: string;
+          type: string;
+          [k: string]: unknown;
+        };
+        capabilities?: {
+          add?: string[];
+          drop?: string[];
+          [k: string]: unknown;
+        };
+        privileged?: boolean;
+        procMount?: string;
+        readOnlyRootFilesystem?: boolean;
+        runAsGroup?: number;
+        runAsNonRoot?: boolean;
+        runAsUser?: number;
+        seLinuxOptions?: {
+          level?: string;
+          role?: string;
+          type?: string;
+          user?: string;
+          [k: string]: unknown;
+        };
+        seccompProfile?: {
+          localhostProfile?: string;
+          type: string;
+          [k: string]: unknown;
+        };
+        windowsOptions?: {
+          gmsaCredentialSpec?: string;
+          gmsaCredentialSpecName?: string;
+          hostProcess?: boolean;
+          runAsUserName?: string;
+          [k: string]: unknown;
+        };
+        [k: string]: unknown;
+      };
+      startupProbe?: {
+        exec?: {
+          command?: string[];
+          [k: string]: unknown;
+        };
+        failureThreshold?: number;
+        grpc?: {
+          port: number;
+          service?: string;
+          [k: string]: unknown;
+        };
+        httpGet?: {
+          host?: string;
+          httpHeaders?: {
+            name: string;
+            value: string;
+            [k: string]: unknown;
+          }[];
+          path?: string;
+          port: number | string;
+          scheme?: string;
+          [k: string]: unknown;
+        };
+        initialDelaySeconds?: number;
+        periodSeconds?: number;
+        successThreshold?: number;
+        tcpSocket?: {
+          host?: string;
+          port: number | string;
+          [k: string]: unknown;
+        };
+        terminationGracePeriodSeconds?: number;
+        timeoutSeconds?: number;
+        [k: string]: unknown;
+      };
+      stdin?: boolean;
+      stdinOnce?: boolean;
+      terminationMessagePath?: string;
+      terminationMessagePolicy?: string;
+      tty?: boolean;
+      volumeDevices?: {
+        devicePath: string;
+        name: string;
+        [k: string]: unknown;
+      }[];
+      volumeMounts?: {
+        mountPath: string;
+        mountPropagation?: string;
+        name: string;
+        readOnly?: boolean;
+        recursiveReadOnly?: string;
+        subPath?: string;
+        subPathExpr?: string;
+        [k: string]: unknown;
+      }[];
+      workingDir?: string;
+      [k: string]: unknown;
+    };
+    supportedUriFormats: {
+      prefix?: string;
+      regex?: string;
       [k: string]: unknown;
     }[];
-    /**
-     * CloneStrategy defines the preferred method for performing a CDI clone
-     */
-    cloneStrategy?: string;
-    /**
-     * DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources
-     */
-    dataImportCronSourceFormat?: string;
-    /**
-     * SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.
-     */
-    snapshotClass?: string;
-    [k: string]: unknown;
-  };
-  /**
-   * StorageProfileStatus provides the most recently observed status of the StorageProfile
-   */
-  status?: {
-    /**
-     * ClaimPropertySets computed from the spec and detected in the system
-     *
-     * @maxItems 8
-     */
-    claimPropertySets?: {
-      /**
-       * AccessModes contains the desired access modes the volume should have.
-       * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-       *
-       * @maxItems 4
-       */
-      accessModes: string[];
-      /**
-       * VolumeMode defines what type of volume is required by the claim.
-       * Value of Filesystem is implied when not included in claim spec.
-       */
-      volumeMode: 'Block' | 'Filesystem';
-      [k: string]: unknown;
-    }[];
-    /**
-     * CloneStrategy defines the preferred method for performing a CDI clone
-     */
-    cloneStrategy?: string;
-    /**
-     * Conditions contains the current conditions observed for the StorageProfile
-     */
-    conditions?: {
-      lastHeartbeatTime?: string;
-      lastTransitionTime?: string;
-      message?: string;
-      reason?: string;
-      status: string;
-      /**
-       * StorageProfileConditionType is the string representation of known condition types
-       */
-      type: string;
-      [k: string]: unknown;
-    }[];
-    /**
-     * DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources
-     */
-    dataImportCronSourceFormat?: string;
-    /**
-     * The Storage class provisioner plugin name
-     */
-    provisioner?: string;
-    /**
-     * SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.
-     */
-    snapshotClass?: string;
-    /**
-     * The StorageClass name for which capabilities are defined
-     */
-    storageClass?: string;
+    supportsMultiModelDownload?: boolean;
+    workloadType?: string;
     [k: string]: unknown;
   };
   [k: string]: unknown;

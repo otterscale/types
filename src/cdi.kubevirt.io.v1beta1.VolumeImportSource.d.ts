@@ -218,6 +218,12 @@ export interface CdiKubevirtIoV1Beta1VolumeImportSource {
          */
         certConfigMap?: string;
         /**
+         * Checksum is the expected checksum of the file. Format: "algorithm:hash", e.g., "sha256:1234abcd..." or "md5:5678efgh..."
+         * Supported algorithms: md5, sha1, sha256, sha512
+         * If specified, the importer will verify the downloaded content matches this checksum
+         */
+        checksum?: string;
+        /**
          * ExtraHeaders is a list of strings containing extra headers to include with HTTP transfer requests
          */
         extraHeaders?: string[];

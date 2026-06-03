@@ -1,12 +1,6 @@
-/** Generated from Remote JSON Schema for module.otterscale.io.v1alpha1.Module */
+/** Generated from Remote JSON Schema for objectbucket.io.v1alpha1.ObjectBucket */
 
-/**
- * Module is the Schema for the modules API.
- * A Module represents an installed platform addon instantiated from a ModuleTemplate.
- * The controller creates the corresponding FluxCD HelmRelease or Kustomization
- * and reflects its status back to the Module.
- */
-export interface ModuleOtterscaleIoV1Alpha1Module {
+export interface ObjectbucketIoV1Alpha1ObjectBucket {
   /**
    * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
@@ -157,132 +151,32 @@ export interface ModuleOtterscaleIoV1Alpha1Module {
     uid?: string;
     [k: string]: unknown;
   };
-  /**
-   * Spec defines the desired behavior of the Module.
-   */
-  spec: {
-    /**
-     * ApprovedTemplateGeneration is the ModuleTemplate generation that has been
-     * approved for deployment. When the referenced ModuleTemplate's generation
-     * exceeds this value, the controller will not apply changes until this field
-     * is updated to match or exceed the new generation.
-     *
-     * Leave unset (nil) to auto-approve all template changes (legacy behavior).
-     * Set explicitly to enable manual upgrade approval.
-     */
-    approvedTemplateGeneration?: number;
-    /**
-     * Namespace overrides the default target namespace defined in the ModuleTemplate.
-     * If not specified, the namespace from the ModuleTemplate is used.
-     */
-    namespace?: string;
-    /**
-     * TemplateRef is the name of the ModuleTemplate to instantiate.
-     * This field is immutable after creation.
-     */
-    templateRef: string;
-    /**
-     * Values overrides the default Helm chart values for HelmRelease-based modules.
-     * Only applicable when the referenced ModuleTemplate uses a HelmRelease.
-     * Ignored for Kustomization-based modules.
-     */
-    values?: {
+  spec?: {
+    additionalState?: {
       [k: string]: unknown;
     };
+    authentication?: {
+      [k: string]: unknown;
+    };
+    claimRef?: {
+      [k: string]: unknown;
+    };
+    endpoint?: {
+      additionalConfig?: {
+        [k: string]: unknown;
+      };
+      bucketHost?: string;
+      bucketName?: string;
+      bucketPort?: number;
+      region?: string;
+      subRegion?: string;
+      [k: string]: unknown;
+    };
+    reclaimPolicy?: string;
+    storageClassName?: string;
     [k: string]: unknown;
   };
-  /**
-   * Status represents the current information about the Module.
-   */
   status?: {
-    /**
-     * AppliedTemplateGeneration is the ModuleTemplate generation that was last
-     * successfully applied to the FluxCD resources. The controller uses this to
-     * detect whether a template upgrade is pending.
-     */
-    appliedTemplateGeneration?: number;
-    /**
-     * AvailableTemplateGeneration is the latest generation of the referenced
-     * ModuleTemplate. When this exceeds AppliedTemplateGeneration, an upgrade
-     * is available.
-     */
-    availableTemplateGeneration?: number;
-    /**
-     * Conditions store the status conditions of the Module (e.g., Ready, TemplateNotFound).
-     */
-    conditions?: {
-      /**
-       * lastTransitionTime is the last time the condition transitioned from one status to another.
-       * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
-       */
-      lastTransitionTime: string;
-      /**
-       * message is a human readable message indicating details about the transition.
-       * This may be an empty string.
-       */
-      message: string;
-      /**
-       * observedGeneration represents the .metadata.generation that the condition was set based upon.
-       * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
-       * with respect to the current state of the instance.
-       */
-      observedGeneration?: number;
-      /**
-       * reason contains a programmatic identifier indicating the reason for the condition's last transition.
-       * Producers of specific condition types may define expected values and meanings for this field,
-       * and whether the values are considered a guaranteed API.
-       * The value should be a CamelCase string.
-       * This field may not be empty.
-       */
-      reason: string;
-      /**
-       * status of the condition, one of True, False, Unknown.
-       */
-      status: 'True' | 'False' | 'Unknown';
-      /**
-       * type of condition in CamelCase or in foo.example.com/CamelCase.
-       */
-      type: string;
-      [k: string]: unknown;
-    }[];
-    /**
-     * HelmReleaseRef is a reference to the FluxCD HelmRelease managed by this Module.
-     */
-    helmReleaseRef?: {
-      /**
-       * Name is the name of the referenced resource.
-       */
-      name: string;
-      /**
-       * Namespace is the namespace of the referenced resource.
-       */
-      namespace?: string;
-      [k: string]: unknown;
-    };
-    /**
-     * KustomizationRef is a reference to the FluxCD Kustomization managed by this Module.
-     */
-    kustomizationRef?: {
-      /**
-       * Name is the name of the referenced resource.
-       */
-      name: string;
-      /**
-       * Namespace is the namespace of the referenced resource.
-       */
-      namespace?: string;
-      [k: string]: unknown;
-    };
-    /**
-     * Namespace is the resolved target namespace where FluxCD resources are deployed.
-     * It reflects the effective namespace (Module override or ModuleTemplate default).
-     */
-    namespace?: string;
-    /**
-     * ObservedGeneration is the most recent generation observed by the controller.
-     * It corresponds to the Module's generation, which is updated on mutation by the API Server.
-     */
-    observedGeneration?: number;
     [k: string]: unknown;
   };
   [k: string]: unknown;

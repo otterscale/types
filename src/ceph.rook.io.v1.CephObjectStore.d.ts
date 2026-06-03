@@ -987,6 +987,12 @@ export interface CephRookIoV1CephObjectStore {
         annotations?: {
           [k: string]: string;
         };
+        /**
+         * The labels-related configuration to add/set on each rgw service.
+         */
+        labels?: {
+          [k: string]: string;
+        };
         [k: string]: unknown;
       };
       /**
@@ -1622,10 +1628,12 @@ export interface CephRookIoV1CephObjectStore {
         /**
          * The data pool used to store ObjectStore data that cannot use erasure coding (ex: multi-part uploads).
          * If dataPoolName is not erasure coded, then there is no need for dataNonECPoolName.
+         * WARNING: Do not change this field after creation. Pool names are used in RADOS namespaces and renaming leads to data loss.
          */
         dataNonECPoolName?: string;
         /**
          * The data pool used to store ObjectStore objects data.
+         * WARNING: Do not change this field after creation. Pool names are used in RADOS namespaces and renaming leads to data loss.
          */
         dataPoolName: string;
         /**
@@ -1635,6 +1643,7 @@ export interface CephRookIoV1CephObjectStore {
         default?: boolean;
         /**
          * The metadata pool used to store ObjectStore bucket index.
+         * WARNING: Do not change this field after creation. Pool names are used in RADOS namespaces and renaming leads to data loss.
          */
         metadataPoolName: string;
         /**
@@ -1645,10 +1654,13 @@ export interface CephRookIoV1CephObjectStore {
          * StorageClasses can be selected by user to override dataPoolName during object creation.
          * Each placement has default STANDARD StorageClass pointing to dataPoolName.
          * This list allows defining additional StorageClasses on top of default STANDARD storage class.
+         *
+         * @maxItems 10
          */
         storageClasses?: {
           /**
            * DataPoolName is the data pool used to store ObjectStore objects data.
+           * WARNING: Do not change this field after creation. Pool names are used in RADOS namespaces and renaming leads to data loss.
            */
           dataPoolName: string;
           /**
