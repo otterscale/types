@@ -64,6 +64,7 @@ const INCLUDE_GROUPS = new Set([
   "instancetype.kubevirt.io",
   "kubevirt.io",
   "kustomize.toolkit.fluxcd.io",
+  "license.otterscale.io",
   "migrations.kubevirt.io",
   "networking.k8s.io",
   "node.k8s.io",
