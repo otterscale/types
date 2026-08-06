@@ -1,0 +1,2 @@
+overrides:
+  '@otterscale/api': link:../api/ts
