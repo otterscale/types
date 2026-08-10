@@ -9,7 +9,7 @@ import { parseArgs } from "util";
 import { ResourceService } from "@otterscale/api/resource/v1";
 
 const { values } = parseArgs({
-  args: process.argv.slice(2).filter((arg) => arg !== "--"),
+  args: process.argv.slice(2),
   options: {
     cluster: {
       type: "string",
