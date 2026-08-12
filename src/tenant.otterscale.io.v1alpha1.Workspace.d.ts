@@ -160,6 +160,11 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
    */
   spec: {
     /**
+     * LicenseInjection indicates whether the underlying namespace should be
+     * labeled with "license.phison.com/inject=true"
+     */
+    licenseInjection?: boolean;
+    /**
      * LimitRange defines the default resource limits and requests for pods in the workspace.
      */
     limitRange?: {
@@ -262,6 +267,11 @@ export interface TenantOtterscaleIoV1Alpha1Workspace {
       enabled?: boolean;
       [k: string]: unknown;
     };
+    /**
+     * RancherProjectID is the full Rancher Project identifier copied from
+     * the managed cluster configuration, in "<cluster-id>:<project-id>" form.
+     */
+    rancherProjectID?: string;
     /**
      * ResourceQuota defines the compute resource constraints (CPU, Memory, etc.) applied to the underlying namespace.
      */
